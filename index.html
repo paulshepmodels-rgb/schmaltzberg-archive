@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TW Archive" />
+  <title>TORCHWOOD // TW-XENO/DSK-60</title>
+  <!-- MIT-licensed QR generator; auto-cached to localStorage for offline convention halls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <style>
+    * {
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: rgba(34, 211, 238, 0.25);
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000b24;
+      background-image: -webkit-radial-gradient(50% 30%, circle, #003b75 0%, #001f4a 45%, #000718 100%);
+      background-image: radial-gradient(circle at 50% 30%, #003b75 0%, #001f4a 45%, #000718 100%);
+      color: #f0f9ff;
+      font-family: "Futura", "Century Gothic", "Trebuchet MS", Helvetica, Arial, sans-serif;
+      touch-action: manipulation;
+    }
+
+    .scanlines {
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      pointer-events: none;
+      background-image: -webkit-repeating-linear-gradient(
+        top,
+        rgba(255, 255, 255, 0.018) 0px,
+        rgba(255, 255, 255, 0.018) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      background-image: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.018) 0px,
+        rgba(255, 255, 255, 0.018) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      z-index: 900;
+    }
+
+    /* ============================================================
+       SOFT GLOWING / FADING RED ALERT EDGE VIGNETTE
+    ============================================================ */
+    @-webkit-keyframes redEdgePulse {
+      0%   { opacity: 0.18; }
+      50%  { opacity: 1.0; }
+      100% { opacity: 0.18; }
+    }
+    @keyframes redEdgePulse {
+      0%   { opacity: 0.18; }
+      50%  { opacity: 1.0; }
+      100% { opacity: 0.18; }
+    }
+
+    .red-alert-vignette {
+      display: none;
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      pointer-events: none;
+      z-index: 820;
+      background-image: -webkit-radial-gradient(
+        center, ellipse cover,
+        rgba(220, 38, 38, 0) 50%,
+        rgba(220, 38, 38, 0.36) 80%,
+        rgba(239, 68, 68, 0.88) 100%
+      );
+      background-image: radial-gradient(
+        ellipse at center,
+        rgba(220, 38, 38, 0) 50%,
+        rgba(220, 38, 38, 0.36) 80%,
+        rgba(239, 68, 68, 0.88) 100%
+      );
+      -webkit-box-shadow:
+        inset 0 0 65px 14px rgba(239, 68, 68, 0.92),
+        inset 0 0 135px 32px rgba(153, 27, 27, 0.72);
+      box-shadow:
+        inset 0 0 65px 14px rgba(239, 68, 68, 0.92),
+        inset 0 0 135px 32px rgba(153, 27, 27, 0.72);
+      -webkit-animation: redEdgePulse 1.45s ease-in-out infinite;
+      animation: redEdgePulse 1.45s ease-in-out infinite;
+    }
+
+    .red-alert-vignette.active {
+      display: block;
+    }
+
+    /* Outer Hub Screen Frame */
+    .hub-frame {
+      position: absolute;
+      top: 8px; right: 8px; bottom: 8px; left: 8px;
+      border: 1.5px solid rgba(125, 211, 252, 0.55);
+      -webkit-box-shadow: inset 0 0 36px rgba(0, 140, 255, 0.25);
+      box-shadow: inset 0 0 36px rgba(0, 140, 255, 0.25);
+      overflow: hidden;
+    }
+
+    .bg-watermark {
+      position: absolute;
+      top: 6%;
+      left: 50%;
+      width: 460px;
+      margin-left: -230px;
+      opacity: 0.13;
+      pointer-events: none;
+    }
+
+    .corner-logo {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      width: 56px;
+      opacity: 0.9;
+      z-index: 25;
+      cursor: pointer;
+    }
+
+    /* Top Status Bar */
+    .status-header {
+      position: absolute;
+      top: 18px;
+      left: 16px;
+      right: 78px;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .status-text {
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      color: #dbeafe;
+      text-shadow: 0 0 8px rgba(147, 197, 253, 0.75);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-triangle {
+      display: inline-block;
+      width: 0; height: 0;
+      margin-right: 6px;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+      border-left: 6px solid #e0f2fe;
+    }
+
+    .status-rule {
+      height: 7px;
+      border-top: 1.5px solid rgba(224, 242, 254, 0.72);
+      border-left: 1.5px solid rgba(224, 242, 254, 0.72);
+    }
+
+    /* Center Brand Header */
+    .brand-banner {
+      position: absolute;
+      top: 52px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      z-index: 5;
+      -webkit-transition: top 0.3s ease;
+      transition: top 0.3s ease;
+    }
+
+    .brand-banner.compact {
+      top: 44px;
+    }
+
+    .brand-inner {
+      display: inline-block;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .icon-box {
+      display: inline-block;
+      vertical-align: middle;
+      width: 72px;
+      height: 72px;
+      margin-right: 16px;
+      border: 2.5px solid #e0f2fe;
+      border-radius: 14px;
+      background: rgba(0, 35, 80, 0.45);
+      -webkit-box-shadow: 0 0 18px rgba(56, 189, 248, 0.8), inset 0 0 14px rgba(56, 189, 248, 0.45);
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.8), inset 0 0 14px rgba(56, 189, 248, 0.45);
+      padding: 9px;
+    }
+
+    .brand-banner.compact .icon-box {
+      width: 54px;
+      height: 54px;
+      padding: 6px;
+      border-radius: 11px;
+      margin-right: 12px;
+    }
+
+    .brand-titles {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .brand-main {
+      font-size: 42px;
+      letter-spacing: 0.08em;
+      line-height: 0.95;
+      color: #ffffff;
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.85), 0 0 24px rgba(56, 189, 248, 0.75);
+    }
+
+    .brand-banner.compact .brand-main {
+      font-size: 32px;
+    }
+
+    .brand-sub {
+      font-size: 16px;
+      letter-spacing: 0.04em;
+      color: #e0f2fe;
+      margin-top: 4px;
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-banner.compact .brand-sub {
+      font-size: 13px;
+    }
+
+    /* ============================================================
+       TORCHWOOD MODAL WINDOW (PORTRAIT FULL-HEIGHT ANCHORED)
+    ============================================================ */
+    .tw-window-wrap {
+      position: absolute;
+      top: 168px;
+      left: 16px;
+      right: 16px;
+      bottom: 62px;
+      z-index: 10;
+    }
+
+    .tw-window-wrap.logon-mode {
+      top: 175px;
+      bottom: auto;
+      height: 490px;
+      max-width: 610px;
+      margin: 0 auto;
+    }
+
+    .tw-window-wrap.expanded {
+      top: 118px;
+      bottom: 54px;
+    }
+
+    .tw-tab {
+      display: inline-block;
+      background: rgba(12, 64, 100, 0.92);
+      border: 1.5px solid rgba(103, 232, 249, 0.78);
+      border-bottom: none;
+      padding: 5px 18px 4px 12px;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      color: #f0f9ff;
+      position: relative;
+      top: 1px;
+      height: 26px;
+    }
+
+    .tw-window {
+      position: absolute;
+      top: 26px;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-color: rgba(6, 44, 74, 0.88);
+      background-image: -webkit-repeating-linear-gradient(
+        114deg,
+        rgba(255, 255, 255, 0.025) 0px,
+        rgba(255, 255, 255, 0.025) 2px,
+        transparent 2px,
+        transparent 6px
+      );
+      background-image: repeating-linear-gradient(
+        -24deg,
+        rgba(255, 255, 255, 0.025) 0px,
+        rgba(255, 255, 255, 0.025) 2px,
+        transparent 2px,
+        transparent 6px
+      );
+      border: 1.5px solid rgba(103, 232, 249, 0.78);
+      -webkit-box-shadow: 0 0 24px rgba(34, 211, 238, 0.45), inset 0 0 28px rgba(0, 140, 210, 0.25);
+      box-shadow: 0 0 24px rgba(34, 211, 238, 0.45), inset 0 0 28px rgba(0, 140, 210, 0.25);
+    }
+
+    .tw-titlebar {
+      position: absolute;
+      top: 7px;
+      left: 10px;
+      right: 10px;
+      height: 24px;
+    }
+
+    .tw-address-pill {
+      display: inline-block;
+      background: rgba(165, 216, 255, 0.74);
+      color: #03223f;
+      font-family: "Courier New", Courier, monospace;
+      font-weight: bold;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      padding: 4px 18px 3px 10px;
+      max-width: 78%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tw-window-actions {
+      position: absolute;
+      right: 2px;
+      top: 1px;
+    }
+
+    .tw-lock-icon {
+      width: 15px;
+      height: 15px;
+      fill: #38bdf8;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+
+    .tw-close-btn {
+      display: inline-block;
+      vertical-align: middle;
+      width: 22px;
+      height: 22px;
+      background: rgba(12, 74, 110, 0.9);
+      border: 1px solid #38bdf8;
+      color: #7dd3fc;
+      font-size: 14px;
+      line-height: 20px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .tw-body-row {
+      position: absolute;
+      top: 38px;
+      right: 10px;
+      bottom: 10px;
+      left: 10px;
+    }
+
+    .tw-scrollbar-rail {
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      width: 18px;
+      border: 1px solid rgba(186, 230, 253, 0.65);
+      background: rgba(2, 28, 52, 0.65);
+    }
+
+    .scroll-arrow-up, .scroll-arrow-down {
+      position: absolute;
+      left: 0; right: 0;
+      height: 22px;
+      text-align: center;
+      font-size: 10px;
+      line-height: 22px;
+      color: #bae6fd;
+      cursor: pointer;
+    }
+    .scroll-arrow-up { top: 0; border-bottom: 1px solid rgba(186, 230, 253, 0.35); }
+    .scroll-arrow-down { bottom: 0; border-top: 1px solid rgba(186, 230, 253, 0.35); }
+
+    .scroll-thumb {
+      position: absolute;
+      top: 26px;
+      left: 3px;
+      right: 3px;
+      height: 54px;
+      border: 1px solid #e0f2fe;
+      background-image: -webkit-repeating-linear-gradient(
+        top,
+        rgba(186, 230, 253, 0.85) 0px,
+        rgba(186, 230, 253, 0.85) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+      background-image: repeating-linear-gradient(
+        to bottom,
+        rgba(186, 230, 253, 0.85) 0px,
+        rgba(186, 230, 253, 0.85) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+    }
+
+    .tw-inner-pane {
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 26px;
+      border: 1.5px solid rgba(224, 242, 254, 0.78);
+      background: rgba(3, 28, 52, 0.68);
+      padding: 16px 18px;
+      font-family: "Courier New", Courier, monospace;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ============================================================
+       VIEW 1: ATTRACT / AUTHORISATION LOGON
+    ============================================================ */
+    .logon-title {
+      font-size: 22px;
+      letter-spacing: 0.08em;
+      color: #f0f9ff;
+      margin: 0 0 8px 0;
+      font-weight: normal;
+    }
+
+    .logon-divider {
+      height: 2px;
+      background: #e0f2fe;
+      -webkit-box-shadow: 0 0 8px rgba(125, 211, 252, 0.9);
+      box-shadow: 0 0 8px rgba(125, 211, 252, 0.9);
+      margin-bottom: 16px;
+    }
+
+    .logon-prompt {
+      font-size: 15px;
+      color: #e0f2fe;
+      margin-bottom: 14px;
+    }
+
+    .file-alert-card {
+      border: 1px solid rgba(103, 232, 249, 0.65);
+      background: rgba(14, 74, 110, 0.45);
+      padding: 14px;
+      margin-bottom: 18px;
+    }
+
+    .file-alert-code {
+      font-size: 11px;
+      color: #67e8f9;
+      letter-spacing: 0.08em;
+      margin-bottom: 5px;
+    }
+
+    .file-alert-title {
+      font-size: 20px;
+      color: #ffffff;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .file-alert-sub {
+      font-size: 12px;
+      color: #bae6fd;
+      line-height: 1.5;
+    }
+
+    .tw-btn-big {
+      display: block;
+      width: 100%;
+      padding: 16px 14px;
+      background: rgba(6, 148, 182, 0.68);
+      border: 2px solid #7dd3fc;
+      color: #ffffff;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      text-align: center;
+      -webkit-box-shadow: 0 0 16px rgba(34, 211, 238, 0.45);
+      box-shadow: 0 0 16px rgba(34, 211, 238, 0.45);
+      margin-bottom: 16px;
+    }
+
+    .tw-btn-big:active {
+      background: rgba(34, 211, 238, 0.88);
+      color: #001a33;
+    }
+
+    .quick-pass-row {
+      margin-top: 10px;
+      padding-top: 12px;
+      border-top: 1px dashed rgba(125, 211, 252, 0.3);
+      font-size: 12px;
+      color: #93c5fd;
+    }
+
+    .mini-login-input {
+      background: rgba(0, 15, 35, 0.8);
+      border: 1px solid rgba(125, 211, 252, 0.5);
+      color: #ffffff;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 13px;
+      padding: 7px 9px;
+      width: 190px;
+      margin-top: 8px;
+      margin-right: 6px;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .tw-btn-small {
+      background: rgba(14, 116, 144, 0.68);
+      border: 1px solid #7dd3fc;
+      color: #f0f9ff;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+
+    .override-toast {
+      display: none;
+      margin-bottom: 12px;
+      padding: 9px 12px;
+      border: 1px solid #4ade80;
+      background: rgba(6, 78, 59, 0.6);
+      color: #bbf7d0;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    /* ============================================================
+       VIEW 2: ARCHIVE DOSSIER EXPLORER
+    ============================================================ */
+    .archive-shell { display: none; }
+    .archive-shell.active { display: block; }
+
+    .nav-bar {
+      border-bottom: 1px solid rgba(125, 211, 252, 0.45);
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+    }
+
+    .nav-tab {
+      display: inline-block;
+      background: rgba(4, 42, 74, 0.82);
+      border: 1px solid rgba(125, 211, 252, 0.45);
+      color: #bae6fd;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 9px 10px;
+      margin-right: 5px;
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+
+    .nav-tab.active {
+      background: rgba(14, 165, 233, 0.58);
+      border-color: #ffffff;
+      color: #ffffff;
+      -webkit-box-shadow: 0 0 10px rgba(56, 189, 248, 0.55);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.55);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .meta-grid {
+      border: 1px solid rgba(103, 232, 249, 0.4);
+      background: rgba(0, 18, 42, 0.65);
+      padding: 11px 13px;
+      margin-bottom: 14px;
+      font-size: 12.5px;
+      line-height: 1.75;
+    }
+
+    .meta-label { color: #67e8f9; font-weight: bold; }
+
+    .status-pill {
+      display: inline-block;
+      padding: 1px 7px;
+      border: 1px solid #4ade80;
+      color: #4ade80;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .meta-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border: 1px solid #fde047;
+      color: #fde047;
+      font-size: 11px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      letter-spacing: 0.06em;
+    }
+
+    .section-h {
+      font-size: 16.5px;
+      color: #ffffff;
+      border-bottom: 1px solid rgba(125, 211, 252, 0.4);
+      padding-bottom: 4px;
+      margin: 16px 0 10px 0;
+      letter-spacing: 0.06em;
+    }
+
+    .lore-p {
+      font-size: 13.8px;
+      line-height: 1.56;
+      color: #dbeafe;
+      margin: 0 0 11px 0;
+    }
+
+    .callout-box {
+      border-left: 3px solid #22d3ee;
+      background: rgba(8, 56, 92, 0.55);
+      padding: 11px 14px;
+      margin: 12px 0;
+      font-size: 14px;
+      color: #ffffff;
+      font-weight: bold;
+      line-height: 1.65;
+    }
+
+    .quote-banner {
+      border: 1px dashed rgba(125, 211, 252, 0.6);
+      background: rgba(0, 16, 38, 0.7);
+      padding: 12px 14px;
+      margin: 14px 0;
+      text-align: center;
+      font-size: 14px;
+      color: #fde047;
+      font-weight: bold;
+      letter-spacing: 0.04em;
+    }
+
+    .ref-box {
+      border: 1px solid rgba(103, 232, 249, 0.35);
+      background: rgba(0, 14, 34, 0.72);
+      padding: 10px 12px;
+      margin: 12px 0;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #93c5fd;
+      word-break: break-word;
+    }
+
+    /* Social QR Card */
+    .qr-social-card {
+      display: table;
+      width: 100%;
+      border: 1.5px solid #22d3ee;
+      background: rgba(0, 22, 48, 0.78);
+      padding: 12px;
+      margin: 14px 0;
+      cursor: pointer;
+    }
+
+    .qr-img-cell {
+      display: table-cell;
+      width: 138px;
+      vertical-align: middle;
+      padding-right: 14px;
+    }
+
+    .qr-white-frame {
+      background: #ffffff;
+      padding: 6px;
+      border: 2px solid #67e8f9;
+      text-align: center;
+      width: 128px;
+      height: 128px;
+    }
+
+    .qr-white-frame img {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .qr-text-cell {
+      display: table-cell;
+      vertical-align: middle;
+    }
+
+    .qr-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #ffffff;
+      margin-bottom: 5px;
+      letter-spacing: 0.05em;
+    }
+
+    .qr-desc {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #bae6fd;
+      margin-bottom: 6px;
+    }
+
+    .qr-tap-hint {
+      font-size: 11px;
+      color: #67e8f9;
+      font-weight: bold;
+    }
+
+    .lore-list {
+      margin: 8px 0 14px 0;
+      padding-left: 20px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #dbeafe;
+    }
+    .lore-list li { margin-bottom: 5px; }
+
+    .photo-frame {
+      border: 1.5px solid #67e8f9;
+      background: #000c1d;
+      padding: 6px;
+      cursor: pointer;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .photo-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 310px;
+      object-fit: contain;
+      margin: 0 auto;
+    }
+
+    .photo-caption {
+      font-size: 11px;
+      color: #7dd3fc;
+      padding-top: 6px;
+      letter-spacing: 0.04em;
+    }
+
+    .photo-placeholder {
+      padding: 32px 12px;
+      border: 1px dashed rgba(125, 211, 252, 0.45);
+      color: #93c5fd;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .unit-columns {
+      width: 100%;
+      display: table;
+      table-layout: fixed;
+    }
+    .unit-col-photo {
+      display: table-cell;
+      width: 44%;
+      vertical-align: top;
+      padding-right: 14px;
+    }
+    .unit-col-info {
+      display: table-cell;
+      width: 56%;
+      vertical-align: top;
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+    .spec-table td {
+      border: 1px solid rgba(125, 211, 252, 0.25);
+      padding: 5px 8px;
+    }
+    .spec-key {
+      color: #67e8f9;
+      width: 40%;
+      font-weight: bold;
+    }
+
+    .status-board {
+      border: 1px solid rgba(103, 232, 249, 0.5);
+      background: rgba(0, 14, 34, 0.75);
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .epigraph {
+      margin-top: 14px;
+      font-style: italic;
+      color: #bae6fd;
+      text-align: center;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    .node-footer {
+      position: absolute;
+      bottom: 12px;
+      left: 16px;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .node-glyph {
+      width: 32px;
+      height: 32px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    .node-text {
+      display: inline-block;
+      vertical-align: middle;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: #93c5fd;
+    }
+
+    .kiosk-controls {
+      position: absolute;
+      bottom: 11px;
+      right: 12px;
+      z-index: 30;
+    }
+
+    .kiosk-btn {
+      background: rgba(6, 45, 75, 0.85);
+      border: 1px solid rgba(125, 211, 252, 0.5);
+      color: #bae6fd;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 11px;
+      padding: 7px 10px;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+
+    /* ============================================================
+       RED ALERT LOCKDOWN POPUP WINDOW
+    ============================================================ */
+    .lockdown-overlay {
+      display: none;
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: rgba(20, 2, 6, 0.58);
+      z-index: 860;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .lockdown-overlay.open { display: block; }
+
+    .lockdown-wrap {
+      display: inline-block;
+      width: 580px;
+      max-width: 96%;
+      text-align: left;
+      margin-top: 14vh;
+    }
+
+    .lockdown-tab {
+      display: inline-block;
+      background: rgba(127, 29, 29, 0.95);
+      border: 1.5px solid #f87171;
+      border-bottom: none;
+      padding: 5px 18px 4px 12px;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.06em;
+      color: #fee2e2;
+      position: relative;
+      top: 1px;
+    }
+
+    .lockdown-window {
+      background-color: rgba(48, 8, 14, 0.94);
+      background-image: -webkit-repeating-linear-gradient(
+        114deg,
+        rgba(255, 120, 120, 0.04) 0px,
+        rgba(255, 120, 120, 0.04) 2px,
+        transparent 2px,
+        transparent 6px
+      );
+      background-image: repeating-linear-gradient(
+        -24deg,
+        rgba(255, 120, 120, 0.04) 0px,
+        rgba(255, 120, 120, 0.04) 2px,
+        transparent 2px,
+        transparent 6px
+      );
+      border: 2px solid #f87171;
+      -webkit-box-shadow: 0 0 34px rgba(239, 68, 68, 0.7), inset 0 0 28px rgba(185, 28, 28, 0.45);
+      box-shadow: 0 0 34px rgba(239, 68, 68, 0.7), inset 0 0 28px rgba(185, 28, 28, 0.45);
+      padding: 10px 14px 16px 14px;
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    .lockdown-titlebar {
+      position: relative;
+      margin-bottom: 10px;
+      height: 24px;
+    }
+
+    .lockdown-pill {
+      display: inline-block;
+      background: rgba(254, 202, 202, 0.85);
+      color: #450a0a;
+      font-weight: bold;
+      font-size: 11px;
+      padding: 4px 16px 3px 10px;
+      max-width: 85%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .lockdown-padlock {
+      position: absolute;
+      right: 4px;
+      top: 1px;
+      width: 22px;
+      height: 22px;
+      fill: #f87171;
+      cursor: pointer;
+    }
+
+    .lockdown-inner {
+      border: 1.5px solid rgba(254, 202, 202, 0.75);
+      background: rgba(28, 4, 8, 0.75);
+      padding: 16px;
+    }
+
+    .lockdown-headline {
+      font-size: 19px;
+      font-weight: bold;
+      color: #fecaca;
+      letter-spacing: 0.06em;
+      margin: 0 0 8px 0;
+      text-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+    }
+
+    .lockdown-rule {
+      height: 2px;
+      background: #f87171;
+      margin-bottom: 12px;
+    }
+
+    .lockdown-msg {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: #fee2e2;
+      margin: 0 0 10px 0;
+    }
+
+    .lockdown-auth {
+      border: 1px solid rgba(248, 113, 113, 0.6);
+      background: rgba(127, 29, 29, 0.45);
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #fde047;
+      font-weight: bold;
+      margin-bottom: 14px;
+      letter-spacing: 0.05em;
+    }
+
+    .override-panel {
+      border-top: 1px dashed rgba(248, 113, 113, 0.55);
+      padding-top: 12px;
+    }
+
+    .override-label {
+      font-size: 12px;
+      color: #fca5a5;
+      margin-bottom: 9px;
+      font-weight: bold;
+    }
+
+    .override-btn {
+      display: inline-block;
+      background: rgba(153, 27, 27, 0.75);
+      border: 1.5px solid #fca5a5;
+      color: #ffffff;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 10px 12px;
+      margin-right: 6px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .lockdown-countdown {
+      font-size: 11px;
+      color: #fca5a5;
+      margin-top: 6px;
+      opacity: 0.85;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: rgba(0, 8, 22, 0.92);
+      z-index: 950;
+      padding: 20px;
+      text-align: center;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-overlay.open { display: block; }
+
+    .modal-box {
+      display: inline-block;
+      max-width: 700px;
+      width: 96%;
+      background: #042542;
+      border: 2px solid #22d3ee;
+      padding: 14px;
+      text-align: left;
+      margin-top: 16px;
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    .modal-box img {
+      display: block;
+      max-width: 100%;
+      max-height: 72vh;
+      margin: 0 auto 10px auto;
+    }
+
+    @media (max-width: 640px) {
+      .unit-columns, .unit-col-photo, .unit-col-info,
+      .qr-social-card, .qr-img-cell, .qr-text-cell {
+        display: block;
+        width: 100%;
+        padding-right: 0;
+      }
+      .qr-img-cell { margin-bottom: 10px; }
+      .brand-main { font-size: 30px; }
+      .icon-box { width: 58px; height: 58px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="red-alert-vignette" id="redVignette"></div>
+
+  <div class="hub-frame">
+    <svg class="bg-watermark" id="bgWatermark" viewBox="-55 -25 110 95"></svg>
+    <svg class="corner-logo" id="cornerLogo" viewBox="-55 -25 110 95"></svg>
+
+    <div class="status-header">
+      <div class="status-text">
+        <span class="status-triangle"></span>
+        <span id="statusTicker">STATUS: Live / Examining security protocols...</span>
+      </div>
+      <div class="status-rule"></div>
+    </div>
+
+    <div class="brand-banner" id="brandBanner">
+      <div class="brand-inner">
+        <div class="icon-box">
+          <svg id="badgeLogo" width="100%" height="100%" viewBox="-55 -25 110 95"></svg>
+        </div>
+        <div class="brand-titles">
+          <div class="brand-main">TORCHWOOD</div>
+          <div class="brand-sub" id="extranetSub">secure_extranet: logged in</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tw-window-wrap logon-mode" id="windowWrap">
+      <div class="tw-tab" id="windowTab">Authorisation</div>
+      <div class="tw-window">
+        <div class="tw-titlebar">
+          <div class="tw-address-pill" id="addressBar">/TORCHWOOD HUB/NODE: :     0:3</div>
+          <div class="tw-window-actions">
+            <svg class="tw-lock-icon" viewBox="0 0 24 24">
+              <path d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zm-7-2a2 2 0 0 1 4 0v2h-4V7z"/>
+            </svg>
+            <span class="tw-close-btn" id="logoutBtn" title="Reset Terminal">&times;</span>
+          </div>
+        </div>
+
+        <div class="tw-body-row">
+          <div class="tw-scrollbar-rail">
+            <div class="scroll-arrow-up" id="scrollUpBtn">&#9650;</div>
+            <div class="scroll-thumb"></div>
+            <div class="scroll-arrow-down" id="scrollDownBtn">&#9660;</div>
+          </div>
+
+          <div class="tw-inner-pane" id="innerPane">
+            <!-- VIEW 1: AUTHORISATION SCREEN -->
+            <div id="logonView">
+              <h1 class="logon-title">TORCHWOOD SECURE LOGON</h1>
+              <div class="logon-divider"></div>
+              <div class="logon-prompt">Archive Intercept Active &mdash; Select Access Method :</div>
+
+              <div class="file-alert-card">
+                <div class="file-alert-code">ARCHIVE DESIGNATION: TW-XENO/DSK-60 // ACTIVE / UNRESOLVED</div>
+                <div class="file-alert-title">THE SCHMALTZBERG DALEKS</div>
+                <div class="file-alert-sub">KNOWN UNITS: CASANUNDA (WHITE) &bull; STRONGINTHEARM (GREY) &bull; + BUILD HISTORY</div>
+              </div>
+
+              <button type="button" class="tw-btn-big" id="openArchiveBtn">
+                TAP TO ACCESS DOSSIER TW-XENO/DSK-60
+              </button>
+
+              <div class="quick-pass-row">
+                OPTIONAL AGENT ID:<br />
+                <input type="text" id="agentInput" class="mini-login-input" placeholder="jack / vimes / arthur" />
+                <button type="button" class="tw-btn-small" id="agentLoginBtn">AUTHORISE</button>
+              </div>
+            </div>
+
+            <!-- VIEW 2: SCHMALTZBERG DALEKS ARCHIVE -->
+            <div class="archive-shell" id="archiveView">
+              <div class="override-toast" id="overrideToast"></div>
+
+              <div class="nav-bar">
+                <span class="nav-tab active" data-tab="tabOverview">01 // OVERVIEW</span>
+                <span class="nav-tab" data-tab="tabCasanunda">02 // CASANUNDA</span>
+                <span class="nav-tab" data-tab="tabStronginthearm">03 // STRONGINTHEARM</span>
+                <span class="nav-tab" data-tab="tabError">04 // THE ERROR</span>
+                <span class="nav-tab" data-tab="tabGallery">05 // IMAGES</span>
+                <span class="nav-tab" data-tab="tabMetaBuild">06 // PROP ORIGINS &amp; BUILD</span>
+              </div>
+
+              <!-- TAB 1: OVERVIEW -->
+              <div class="tab-panel active" id="tabOverview">
+                <div class="meta-grid">
+                  <div><span class="meta-label">ARCHIVE DESIGNATION:</span> TW-XENO/DSK-60</div>
+                  <div><span class="meta-label">STATUS:</span> <span class="status-pill">ACTIVE / UNRESOLVED</span></div>
+                  <div><span class="meta-label">ORIGIN:</span> DISCWORLD &mdash; SCHMALTZBERG REGION</div>
+                  <div><span class="meta-label">THREAT CLASSIFICATION:</span> LOW &mdash; POTENTIAL UNKNOWN</div>
+                  <div><span class="meta-label">KNOWN UNITS:</span> CASANUNDA / STRONGINTHEARM</div>
+                </div>
+
+                <h2 class="section-h">ARCHIVE NOTE</h2>
+                <p class="lore-p">The following file concerns two anomalous Dalek units believed to originate from an abandoned reconnaissance programme conducted prior to a proposed Dalek incursion into the Discworld.</p>
+                <p class="lore-p">The precise circumstances remain uncertain.</p>
+                <p class="lore-p"><strong>What is known is that the Daleks made a serious intelligence error.</strong></p>
+                <p class="lore-p"><strong>A remarkably serious intelligence error.</strong></p>
+
+                <h2 class="section-h">TORCHWOOD ASSESSMENT</h2>
+                <p class="lore-p">The two known Schmaltzberg Daleks represent an unusual intersection of Dalek technology, Discworld culture and one of the most significant intelligence failures in recorded inter-dimensional history.</p>
+                <p class="lore-p">They are not merely smaller Daleks. They are physical evidence of a strategic misunderstanding on a potentially planetary scale. The machines were designed to fit a world that the Daleks believed was populated almost entirely by Dwarfs.</p>
+                <p class="lore-p">It was not. Fortunately for everyone involved, nobody appears to have told them.</p>
+
+                <div class="status-board">
+                  <div><span class="meta-label">CASANUNDA</span> &mdash; LOCATED (WHITE/BRASS IMPERIAL PROP)</div>
+                  <div><span class="meta-label">STRONGINTHEARM</span> &mdash; LOCATED (GREY/GOLD CROSSOVER PROP)</div>
+                  <div><span class="meta-label">SCHMALTZBERG PROJECT</span> &mdash; ARCHIVED</div>
+                  <div><span class="meta-label">ORIGINAL DALEK INVASION</span> &mdash; ABORTED</div>
+                  <div><span class="meta-label">DISCWORLD</span> &mdash; STILL ROTATING</div>
+                </div>
+
+                <div style="text-align:center; margin-top:14px;">
+                  <button type="button" class="tw-btn-small" id="quickQrBtn">SCAN FACEBOOK GROUP QR CODE</button>
+                </div>
+
+                <div class="epigraph">
+                  <strong>TORCHWOOD ARCHIVE &mdash; EYES ONLY</strong><br />
+                  &ldquo;We came looking for an invasion force.<br />What we found was a very small problem.&rdquo;
+                </div>
+              </div>
+
+              <!-- TAB 2: CASANUNDA -->
+              <div class="tab-panel" id="tabCasanunda">
+                <div class="unit-columns">
+                  <div class="unit-col-photo">
+                    <div class="photo-frame" id="frameCasanunda">
+                      <img id="imgCasanunda" alt="Dalek Casanunda" />
+                      <div class="photo-placeholder" id="phCasanunda" style="display:none;">
+                        IMAGE FILE NOT FOUND: <strong>casanunda.jpg</strong><br /><br />
+                        Tap <strong>[KIOSK / PHOTOS]</strong> below to load from iPad Camera Roll.
+                      </div>
+                      <div class="photo-caption">FIG 1. CASANUNDA // TAP TO ZOOM</div>
+                    </div>
+                  </div>
+                  <div class="unit-col-info">
+                    <table class="spec-table">
+                      <tr><td class="spec-key">DESIGNATION</td><td>CASANUNDA</td></tr>
+                      <tr><td class="spec-key">CASING</td><td>IMPERIAL WHITE / BRASS</td></tr>
+                      <tr><td class="spec-key">SCALE</td><td>60% / 62.4% COMPACT</td></tr>
+                      <tr><td class="spec-key">STATUS</td><td>LOCATED // CAVERN</td></tr>
+                    </table>
+                    <h2 class="section-h">UNIT DOSSIER: CASANUNDA</h2>
+                    <p class="lore-p">A compact reconnaissance Dalek bearing the designation <strong>Casanunda</strong>.</p>
+                    <p class="lore-p">The name is believed to have been acquired during contact with the Dwarfs of Schmaltzberg. Records indicate that the unit demonstrated unusual persistence when navigating complex underground environments.</p>
+                    <p class="lore-p">Whether the name was assigned by the Daleks, adopted from a local individual, or resulted from a catastrophic translation error is unknown.</p>
+                    <p class="lore-p">Torchwood analysts have noted that the name corresponds to a well-known Dwarfish figure associated with the Discworld. The Daleks appear to have regarded this coincidence as entirely unremarkable.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 3: STRONGINTHEARM -->
+              <div class="tab-panel" id="tabStronginthearm">
+                <div class="unit-columns">
+                  <div class="unit-col-photo">
+                    <div class="photo-frame" id="frameStrong">
+                      <img id="imgStrong" alt="Dalek Stronginthearm" />
+                      <div class="photo-placeholder" id="phStrong" style="display:none;">
+                        IMAGE FILE NOT FOUND: <strong>stronginthearm.jpg</strong><br /><br />
+                        Tap <strong>[KIOSK / PHOTOS]</strong> below to load from iPad Camera Roll.
+                      </div>
+                      <div class="photo-caption">FIG 2. STRONGINTHEARM // TAP TO ZOOM</div>
+                    </div>
+                  </div>
+                  <div class="unit-col-info">
+                    <table class="spec-table">
+                      <tr><td class="spec-key">DESIGNATION</td><td>STRONGINTHEARM</td></tr>
+                      <tr><td class="spec-key">CASING</td><td>GUNMETAL GREY / GOLD</td></tr>
+                      <tr><td class="spec-key">SCALE</td><td>62.4% HYBRID SCOUT</td></tr>
+                      <tr><td class="spec-key">STATUS</td><td>LOCATED // MINE TUNNEL</td></tr>
+                    </table>
+                    <h2 class="section-h">UNIT DOSSIER: STRONGINTHEARM</h2>
+                    <p class="lore-p">The second known unit carries the designation <strong>Stronginthearm</strong>. As with Casanunda, the name appears to have originated from the Dwarfish population encountered during the reconnaissance operation.</p>
+                    <p class="lore-p">Stronginthearm appears to have been intended as a development of the original compact scout platform, incorporating lessons learned during underground operations.</p>
+                    <p class="lore-p">The unit's exact operational history is unknown. It is possible that Stronginthearm was produced after the Daleks realised that the Discworld's subterranean environment was considerably more extensive than first believed.</p>
+                    <p class="lore-p">It is equally possible that nobody informed Davros that most of the Discworld was not, in fact, inhabited by Dwarfs.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 4: THE ERROR -->
+              <div class="tab-panel" id="tabError">
+                <h2 class="section-h">THE RECONNAISSANCE</h2>
+                <p class="lore-p">Prior to the planned invasion of the Discworld, a Dalek reconnaissance force entered through a region subsequently identified as <strong>Schmaltzberg</strong>. There they encountered an extensive population of Dwarfs and a vast network of tunnels, mines and passages.</p>
+                <ol class="lore-list">
+                  <li>The inhabitants were considerably shorter than anticipated.</li>
+                  <li>The majority of accessible passages were significantly narrower than standard Dalek dimensions.</li>
+                  <li>The tunnel network appeared to extend far beyond the limits initially surveyed.</li>
+                </ol>
+
+                <h2 class="section-h">THE FUNDAMENTAL ERROR</h2>
+                <p class="lore-p">The Daleks concluded that the inhabitants encountered at Schmaltzberg were representative of the Discworld population:</p>
+                <div class="callout-box">
+                  THE INHABITANTS ARE SMALL.<br />
+                  THE TUNNELS ARE SMALL.<br />
+                  THEREFORE THE PLANET IS SMALL.
+                </div>
+                <p class="lore-p">Strategic Assessment: <em>&ldquo;FULL-SIZE DALEKS MAY BE UNABLE TO ACCESS SIGNIFICANT AREAS OF THE PLANET.&rdquo;</em></p>
+
+                <h2 class="section-h">THE SCHMALTZBERG PROJECT</h2>
+                <p class="lore-p">Davros authorised a compact reconnaissance platform at <strong>60% of standard Dalek scale</strong>, offering improved access through confined spaces, reduced logistics, greater manoeuvrability underground, and <em>the psychological advantage of appearing unexpectedly small</em>.</p>
+
+                <h2 class="section-h">THE INVASION THAT NEVER HAPPENED</h2>
+                <p class="lore-p">Invasion command suffered logistical difficulties attempting to determine how an entire planet could fit inside a network of tunnels. A proposal to manufacture an even smaller invasion force was rejected:</p>
+                <div class="quote-banner">
+                  &ldquo;EXTERMINATING TINY PEOPLE IS NOT AN EFFICIENT USE OF DALEK RESOURCES.&rdquo;
+                </div>
+                <p class="lore-p">Torchwood has been unable to determine whether this statement was genuine or sarcastic. The latter possibility is considered extremely unlikely.</p>
+              </div>
+
+              <!-- TAB 5: ARCHIVE GALLERY -->
+              <div class="tab-panel" id="tabGallery">
+                <h2 class="section-h">ARCHIVE IMAGES // TAP PLATE TO ENLARGE</h2>
+                <div class="photo-frame" id="galCasanunda">
+                  <img id="imgGalCasanunda" alt="Dalek Casanunda" />
+                  <div class="photo-caption">UNIT 01: CASANUNDA (WHITE / BRASS IMPERIAL)</div>
+                </div>
+                <div class="photo-frame" id="galStrong">
+                  <img id="imgGalStrong" alt="Dalek Stronginthearm" />
+                  <div class="photo-caption">UNIT 02: STRONGINTHEARM (GREY / GOLD HYBRID)</div>
+                </div>
+                <div class="epigraph">
+                  &ldquo;We came looking for an invasion force. What we found was a very small problem.&rdquo;
+                </div>
+              </div>
+
+              <!-- TAB 6: META REAL-WORLD PROP ORIGINS & BUILD LOG -->
+              <div class="tab-panel" id="tabMetaBuild">
+                <span class="meta-pill">META FILE // REAL-WORLD PROP HISTORY &amp; BUILD LOG</span>
+
+                <h2 class="section-h" style="margin-top:4px;">1988 SCREEN ORIGINS: REMEMBRANCE OF THE DALEKS</h2>
+                <div class="unit-columns">
+                  <div class="unit-col-photo">
+                    <div class="photo-frame" id="frame1988">
+                      <img id="img1988" alt="1988 Imperial Dalek Reference" />
+                      <div class="photo-placeholder" id="ph1988" style="display:none;">
+                        1988 REFERENCE PHOTO: <strong>imperial1988.jpg</strong><br /><br />
+                        Load via <strong>[KIOSK / PHOTOS]</strong> to show the original BBC prop alongside the build notes.
+                      </div>
+                      <div class="photo-caption">1988 BBC IMPERIAL DALEK // TAP TO ZOOM</div>
+                    </div>
+                  </div>
+                  <div class="unit-col-info">
+                    <p class="lore-p">Both props trace their lineage to the 1988 Seventh Doctor serial <strong>Remembrance of the Daleks</strong>&mdash;the final Dalek story of the classic series and the very first Dalek story the builder remembers watching as a child.</p>
+                    <p class="lore-p">Set in 1963 London, the serial staged a Dalek civil war between the grey-and-black <strong>Renegade</strong> faction and Davros&rsquo;s cream-white and gold <strong>Imperial Daleks</strong>.</p>
+                    <p class="lore-p">To portray the four Imperial props, the BBC Visual Effects team cast brand-new fibreglass shells from a modified <em>Revelation of the Daleks</em> shoulder plug&mdash;building in raised mesh edges, slat blocks, and solid fibreglass neck drums for crisp, repeatable production.</p>
+                  </div>
+                </div>
+
+                <div class="ref-box">
+                  <strong>HISTORICAL ARCHIVE REFERENCE:</strong> Detailed histories of the 1988 screen props (and Mike Tucker&rsquo;s splitting Imperial Emperor) are documented at <strong>dalek6388.co.uk/remembrance-of-the-daleks/</strong>
+                </div>
+
+                <h2 class="section-h">BUILDING THE SCHMALTZBERG DALEKS (60% &rarr; 62.4%)</h2>
+                <p class="lore-p">With limited workshop space and printer capacity, <strong>60% scale</strong> was chosen for a very practical reason: it was the maximum size the dome could be 3D-printed as a single complete part on an <strong>Ender 5 Plus</strong>.</p>
+
+                <table class="spec-table">
+                  <tr><td class="spec-key">PRINTER</td><td>Creality Ender 5 Plus (single-piece dome limit)</td></tr>
+                  <tr><td class="spec-key">DEBUT</td><td>Sci-Fi Scarborough &mdash; April 2026 (Casanunda)</td></tr>
+                  <tr><td class="spec-key">ELECTRONICS</td><td>Colour-changing dome lights + custom Raspberry Pi voice modulator</td></tr>
+                </table>
+
+                <p class="lore-p"><strong>The Real-World Miscalculation:</strong> Dalek Casanunda debuted at <strong>Sci-Fi Scarborough in April 2026</strong> with classic maiden-outing teething issues (and no lights or voice modulator yet). Studying the convention photos afterward revealed that something looked subtly off&mdash;and just like the Daleks miscalculating the size of the Discworld, a scaling error was discovered.</p>
+
+                <div class="callout-box">
+                  THE SHOULDER SECTION (THE ONE PART NOT DRAWN IN CAD BY HAND) HAD ACTUALLY BEEN SCALED TO 62.4% &mdash; NOT 60%.
+                </div>
+
+                <p class="lore-p"><strong>&ldquo;Trigger&rsquo;s Broom&rdquo; &amp; Birth of Stronginthearm:</strong> Over the 2026 season, Casanunda&rsquo;s skirt and upper sections were progressively reprinted at <strong>62.4%</strong> to match the shoulders&mdash;leaving behind enough original components to joke about building a classic &ldquo;Trigger&rsquo;s Broom&rdquo; out of spare Dalek parts.</p>
+                <p class="lore-p">Instead, printing one extra 62.4% shoulder section gave birth to <strong>Dalek Stronginthearm</strong>. Because Stronginthearm&rsquo;s leftover proportions weren&rsquo;t strictly 1988 screen-accurate, the prop became an intentional crossover between <em>Remembrance</em> Imperials and modern <strong>Time War Daleks</strong>&mdash;complete with a New-Series eye, eyestalk cowl, and plunger.</p>
+                <p class="lore-p">Today, both units feature <strong>colour-changing dome lights</strong> synchronised to a custom <strong>Raspberry Pi voice modulator</strong> designed by the builder.</p>
+
+                <!-- SCANNABLE SOCIAL QR CODE CARD -->
+                <div class="qr-social-card" id="socialQrCard">
+                  <div class="qr-img-cell">
+                    <div class="qr-white-frame">
+                      <img id="imgQrCode" alt="Facebook Group QR Code" />
+                    </div>
+                  </div>
+                  <div class="qr-text-cell">
+                    <div class="qr-title">FOLLOW OUR BUILD LOG &amp; SOCIALS</div>
+                    <div class="qr-desc">
+                      Scan this code with your phone camera to join our Facebook community group for 3D-print build logs, electronics schematics, and convention updates:<br />
+                      <strong>facebook.com/groups/1667605298285632</strong>
+                    </div>
+                    <div class="qr-tap-hint">[ TAP QR CARD TO ENLARGE FOR EASY SCANNING ]</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="node-footer">
+      <svg class="node-glyph" viewBox="0 0 64 64" fill="none">
+        <path d="M32 6 A26 26 0 1 1 8.5 43" stroke="#bae6fd" stroke-width="5"/>
+        <path d="M16 24 A18 18 0 0 1 48 24" stroke="#bae6fd" stroke-width="4"/>
+        <circle cx="32" cy="32" r="5" fill="#bae6fd"/>
+        <line x1="6" y1="32" x2="18" y2="32" stroke="#bae6fd" stroke-width="4"/>
+      </svg>
+      <div class="node-text" id="nodeCounter">BUILDING NODE STRUCTURE 419270</div>
+    </div>
+
+    <div class="kiosk-controls">
+      <button type="button" class="kiosk-btn" id="soundToggle">AUDIO: OFF</button>
+      <button type="button" class="kiosk-btn" id="photoConfigBtn">KIOSK / PHOTOS</button>
+    </div>
+  </div>
+
+  <!-- RED ALERT LOCKDOWN MODAL -->
+  <div class="lockdown-overlay" id="lockdownModal">
+    <div class="lockdown-wrap">
+      <div class="lockdown-tab">CONTAINMENT_ALERT</div>
+      <div class="lockdown-window">
+        <div class="lockdown-titlebar">
+          <div class="lockdown-pill">/TORCHWOOD HUB/LOCKDOWN: AUTH J. HARKNESS</div>
+          <svg class="lockdown-padlock" id="lockdownPadlock" viewBox="0 0 24 24" title="Security Lock">
+            <path d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zm-7-2a2 2 0 0 1 4 0v2h-4V7z"/>
+          </svg>
+        </div>
+        <div class="lockdown-inner">
+          <h2 class="lockdown-headline">DALEK SPECIMENS ACTIVE &amp; ON THE LOOSE</h2>
+          <div class="lockdown-rule"></div>
+          <p class="lockdown-msg">
+            <strong>BREACH DETECTED:</strong> Units <strong>CASANUNDA</strong> and <strong>STRONGINTHEARM</strong> have vacated containment bay Schmaltzberg-04 and are unaccounted for.
+          </p>
+          <p class="lockdown-msg">
+            All Archive terminals have been placed in automatic lockdown. Note: specimens are ~62.4% scale &mdash; watch your ankles and do not offer them tea or stairs.
+          </p>
+          <div class="lockdown-auth">
+            SYSTEMS LOCKED DOWN &mdash; SECURITY AUTH: CAPT. J. HARKNESS [TORCHWOOD 3]
+          </div>
+
+          <div class="override-panel">
+            <div class="override-label">STILL READING? SELECT AN EASTER EGG OVERRIDE TO RESUME:</div>
+            <button type="button" class="override-btn" id="ovSonic">SONIC BYPASS</button>
+            <button type="button" class="override-btn" id="ovTowel">&ldquo;I HAVE A TOWEL&rdquo;</button>
+            <button type="button" class="override-btn" id="ovJack">AUTH: 51ST CENTURY</button>
+            <div class="lockdown-countdown" id="lockdownCountdown">
+              Auto-purging session in 40s unless overridden... (Psst: try tapping the red padlock 3x!)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHTBOX MODAL -->
+  <div class="modal-overlay" id="lightboxModal">
+    <div class="modal-box">
+      <img id="lightboxImg" src="" alt="Surveillance Plate" />
+      <div style="text-align:center;">
+        <div id="lightboxCaption" style="color:#67e8f9; font-size:13px; margin-bottom:10px;"></div>
+        <button type="button" class="tw-btn-small" id="closeLightboxBtn">CLOSE SURVEILLANCE PLATE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KIOSK & PHOTO CONFIG MODAL -->
+  <div class="modal-overlay" id="configModal">
+    <div class="modal-box" style="max-width:520px;">
+      <h2 style="margin:0 0 10px 0; color:#ffffff; font-size:17px;">IPAD KIOSK &amp; PHOTO SETTINGS</h2>
+
+      <div style="margin-bottom:14px; padding:10px; border:1px solid #f87171; background:rgba(127,29,29,0.3);">
+        <div style="font-size:12px; color:#fecaca; margin-bottom:8px; font-weight:bold;">
+          CONTAINMENT LOCKDOWN TIMER
+        </div>
+        <div style="font-size:11px; color:#fee2e2; margin-bottom:10px;" id="timerModeLabel">
+          Current Mode: CONVENTION (Random alert after 35–75s idle)
+        </div>
+        <button type="button" class="tw-btn-small" id="toggleTimingBtn" style="margin-right:6px; margin-bottom:6px;">SWITCH FAST/CONVENTION TIMING</button>
+        <button type="button" class="tw-btn-small" id="testBreachBtn" style="border-color:#f87171; background:rgba(185,28,28,0.7);">TRIGGER BREACH ALERT NOW</button>
+      </div>
+
+      <div style="margin-bottom:10px; padding:9px; border:1px solid #38bdf8;">
+        <div style="font-size:12px; color:#67e8f9; margin-bottom:5px;">1. DALEK CASANUNDA (White Dalek):</div>
+        <input type="file" id="pickCasanunda" accept="image/*" style="color:#fff; font-size:12px;" />
+      </div>
+      <div style="margin-bottom:10px; padding:9px; border:1px solid #38bdf8;">
+        <div style="font-size:12px; color:#67e8f9; margin-bottom:5px;">2. DALEK STRONGINTHEARM (Grey Dalek):</div>
+        <input type="file" id="pickStrong" accept="image/*" style="color:#fff; font-size:12px;" />
+      </div>
+      <div style="margin-bottom:10px; padding:9px; border:1px solid #38bdf8;">
+        <div style="font-size:12px; color:#67e8f9; margin-bottom:5px;">3. 1988 REMEMBRANCE IMPERIAL REF (Optional):</div>
+        <input type="file" id="pick1988" accept="image/*" style="color:#fff; font-size:12px;" />
+      </div>
+      <div style="margin-bottom:10px; padding:9px; border:1px solid #38bdf8;">
+        <div style="font-size:12px; color:#67e8f9; margin-bottom:5px;">4. CUSTOM FACEBOOK QR IMAGE (Optional Offline Override):</div>
+        <input type="file" id="pickQr" accept="image/*" style="color:#fff; font-size:12px;" />
+      </div>
+      <div style="text-align:right; margin-top:12px;">
+        <button type="button" class="tw-btn-small" id="resetPhotosBtn" style="margin-right:8px;">CLEAR SAVED PHOTOS</button>
+        <button type="button" class="tw-btn-small" id="closeConfigBtn">DONE</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      /* =======================================================================
+         1. BUILD HEXAGONAL TORCHWOOD 'T' SVGS (ES5 SAFE)
+      ======================================================================= */
+      function buildTorchwoodHexT(svgEl, fill, stroke, strokeWidth) {
+        var R = 8.4;
+        var dx = 1.5 * R;
+        var dy = Math.sqrt(3) * R;
+        var cells = [
+          [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0],
+          [-1, 1], [0, 1], [1, 1],
+          [-1, 2], [0, 2], [1, 2],
+          [0, 3]
+        ];
+        var html = "";
+        for (var c = 0; c < cells.length; c++) {
+          var col = cells[c][0];
+          var row = cells[c][1];
+          var cx = col * dx;
+          var cy = (row + (Math.abs(col) % 2) * 0.5) * dy;
+          var pts = [];
+          for (var i = 0; i < 6; i++) {
+            var angle = (Math.PI / 3) * i;
+            pts.push((cx + R * Math.cos(angle)).toFixed(2) + "," + (cy + R * Math.sin(angle)).toFixed(2));
+          }
+          html += '<polygon points="' + pts.join(" ") + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + strokeWidth + '" stroke-linejoin="round" />';
+        }
+        svgEl.innerHTML = html;
+      }
+
+      buildTorchwoodHexT(document.getElementById("bgWatermark"), "rgba(186,230,253,0.2)", "#e0f2fe", 1.4);
+      buildTorchwoodHexT(document.getElementById("badgeLogo"), "rgba(255,255,255,0.08)", "#ffffff", 1.8);
+      buildTorchwoodHexT(document.getElementById("cornerLogo"), "#0b2538", "#22d3ee", 2.1);
+
+      /* =======================================================================
+         2. AUDIO ENGINE
+      ======================================================================= */
+      var audioEnabled = false;
+      var audioCtx = null;
+
+      function getAudioCtx() {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        if (!audioCtx) audioCtx = new AC();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        return audioCtx;
+      }
+
+      function playTone(freq, duration, wave) {
+        if (!audioEnabled) return;
+        var ctx = getAudioCtx();
+        if (!ctx) return;
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = wave || "sine";
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.055, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(0);
+        osc.stop(ctx.currentTime + duration);
+      }
+
+      function playAlertKlaxon() {
+        if (!audioEnabled) return;
+        playTone(440, 0.16, "sawtooth");
+        setTimeout(function () { playTone(310, 0.22, "sawtooth"); }, 180);
+      }
+
+      document.getElementById("soundToggle").addEventListener("click", function () {
+        audioEnabled = !audioEnabled;
+        this.textContent = audioEnabled ? "AUDIO: ON" : "AUDIO: OFF";
+        if (audioEnabled) playTone(980, 0.08);
+      });
+
+      /* =======================================================================
+         3. VIEW NAVIGATION
+      ======================================================================= */
+      var logonView = document.getElementById("logonView");
+      var archiveView = document.getElementById("archiveView");
+      var windowWrap = document.getElementById("windowWrap");
+      var brandBanner = document.getElementById("brandBanner");
+      var windowTab = document.getElementById("windowTab");
+      var addressBar = document.getElementById("addressBar");
+      var extranetSub = document.getElementById("extranetSub");
+      var innerPane = document.getElementById("innerPane");
+      var overrideToast = document.getElementById("overrideToast");
+
+      function isArchiveOpen() {
+        return archiveView.className.indexOf("active") !== -1;
+      }
+
+      function openDossier(agentSubtitle) {
+        playTone(720, 0.08);
+        logonView.style.display = "none";
+        archiveView.className = "archive-shell active";
+        windowWrap.className = "tw-window-wrap expanded";
+        brandBanner.className = "brand-banner compact";
+        windowTab.textContent = "TW-XENO/DSK-60";
+        addressBar.textContent = "/TORCHWOOD HUB/ARCHIVE/SCHMALTZBERG_DALEKS";
+        extranetSub.textContent = agentSubtitle || "secure_extranet: logged in";
+        innerPane.scrollTop = 0;
+        scheduleRandomInactivityAlert();
+      }
+
+      function lockToHome() {
+        clearBreachVisuals();
+        archiveView.className = "archive-shell";
+        logonView.style.display = "block";
+        windowWrap.className = "tw-window-wrap logon-mode";
+        brandBanner.className = "brand-banner";
+        windowTab.textContent = "Authorisation";
+        addressBar.textContent = "/TORCHWOOD HUB/NODE: :     0:3";
+        extranetSub.textContent = "secure_extranet: logged in";
+        document.getElementById("agentInput").value = "";
+        overrideToast.style.display = "none";
+        scheduleRandomInactivityAlert();
+      }
+
+      document.getElementById("openArchiveBtn").addEventListener("click", function () {
+        openDossier("secure_extranet: visitor clearance");
+      });
+
+      document.getElementById("agentLoginBtn").addEventListener("click", function () {
+        var val = document.getElementById("agentInput").value.replace(/^\s+|\s+$/g, "").toLowerCase();
+        if (val === "jack" || val === "harkness") {
+          openDossier("secure_extranet: hello, handsome");
+        } else if (val === "vimes" || val === "carrot" || val === "sam") {
+          openDossier("secure_extranet: ankh-morpork watch liaison");
+        } else if (val === "arthur" || val === "42") {
+          openDossier("secure_extranet: mostly harmless");
+        } else if (val === "trigger" || val === "broom") {
+          openDossier("secure_extranet: 17 new heads, 14 new handles");
+        } else {
+          openDossier("secure_extranet: logged in");
+        }
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", lockToHome);
+
+      var navTabs = document.querySelectorAll(".nav-tab");
+      for (var t = 0; t < navTabs.length; t++) {
+        navTabs[t].addEventListener("click", function () {
+          playTone(1050, 0.05);
+          var targetId = this.getAttribute("data-tab");
+          var allTabs = document.querySelectorAll(".nav-tab");
+          var allPanels = document.querySelectorAll(".tab-panel");
+          for (var i = 0; i < allTabs.length; i++) allTabs[i].className = "nav-tab";
+          for (var j = 0; j < allPanels.length; j++) allPanels[j].className = "tab-panel";
+          this.className = "nav-tab active";
+          document.getElementById(targetId).className = "tab-panel active";
+          innerPane.scrollTop = 0;
+        });
+      }
+
+      document.getElementById("scrollUpBtn").addEventListener("click", function () {
+        innerPane.scrollTop -= 130;
+      });
+      document.getElementById("scrollDownBtn").addEventListener("click", function () {
+        innerPane.scrollTop += 130;
+      });
+
+      /* =======================================================================
+         4. RANDOM INACTIVITY LOCKDOWN & EASTER EGG OVERRIDES
+      ======================================================================= */
+      var redVignette = document.getElementById("redVignette");
+      var lockdownModal = document.getElementById("lockdownModal");
+      var countdownEl = document.getElementById("lockdownCountdown");
+      var inactivityTimer = null;
+      var purgeInterval = null;
+      var fastTimingMode = false;
+      var padlockTapCount = 0;
+      var isLockedDown = false;
+
+      function clearBreachVisuals() {
+        isLockedDown = false;
+        redVignette.className = "red-alert-vignette";
+        lockdownModal.className = "lockdown-overlay";
+        clearInterval(purgeInterval);
+        padlockTapCount = 0;
+      }
+
+      function triggerContainmentLockdown() {
+        clearTimeout(inactivityTimer);
+        clearInterval(purgeInterval);
+        isLockedDown = true;
+        padlockTapCount = 0;
+
+        redVignette.className = "red-alert-vignette active";
+        lockdownModal.className = "lockdown-overlay open";
+        playAlertKlaxon();
+
+        var secsLeft = 40;
+        countdownEl.textContent = "Auto-purging session in " + secsLeft + "s unless overridden... (Psst: try tapping the red padlock 3x!)";
+
+        purgeInterval = setInterval(function () {
+          secsLeft--;
+          if (secsLeft <= 0) {
+            clearInterval(purgeInterval);
+            if (isArchiveOpen()) {
+              lockToHome();
+            } else {
+              clearBreachVisuals();
+              scheduleRandomInactivityAlert();
+            }
+          } else {
+            countdownEl.textContent = "Auto-purging session in " + secsLeft + "s unless overridden... (Psst: try tapping the red padlock 3x!)";
+          }
+        }, 1000);
+      }
+
+      function scheduleRandomInactivityAlert() {
+        clearTimeout(inactivityTimer);
+        if (isLockedDown) return;
+        var minMs = fastTimingMode ? 15000 : 35000;
+        var maxMs = fastTimingMode ? 30000 : 75000;
+        var delay = Math.floor(minMs + Math.random() * (maxMs - minMs));
+        inactivityTimer = setTimeout(triggerContainmentLockdown, delay);
+      }
+
+      function applyEasterEggOverride(message) {
+        clearBreachVisuals();
+        playTone(1240, 0.07);
+        setTimeout(function () { playTone(1560, 0.09); }, 80);
+
+        if (!isArchiveOpen()) {
+          openDossier("secure_extranet: lockdown overridden");
+        } else {
+          scheduleRandomInactivityAlert();
+        }
+        overrideToast.textContent = message;
+        overrideToast.style.display = "block";
+        setTimeout(function () {
+          overrideToast.style.display = "none";
+        }, 7000);
+      }
+
+      document.getElementById("ovSonic").addEventListener("click", function () {
+        applyEasterEggOverride("SONIC OVERRIDE ACCEPTED: Please stop buzzing Cardiff Hub terminals — Toshiko Sato.");
+      });
+
+      document.getElementById("ovTowel").addEventListener("click", function () {
+        applyEasterEggOverride("IMPROBABILITY OVERRIDE: Towel verified. Threat level downgraded to MOSTLY HARMLESS.");
+      });
+
+      document.getElementById("ovJack").addEventListener("click", function () {
+        applyEasterEggOverride("AUTH J. HARKNESS ACCEPTED: 'Hello, gorgeous. Keep reading — I'll wrangle the 62.4% ones.'");
+      });
+
+      document.getElementById("lockdownPadlock").addEventListener("click", function () {
+        padlockTapCount++;
+        playTone(600 + padlockTapCount * 180, 0.05);
+        if (padlockTapCount >= 3) {
+          applyEasterEggOverride("HEX OVERRIDE: +++ Out of Cheese Error. Redo From Start. Containment Alarm Silenced +++");
+        }
+      });
+
+      function onUserActivity() {
+        if (!isLockedDown) {
+          scheduleRandomInactivityAlert();
+        }
+      }
+      window.addEventListener("touchstart", onUserActivity, false);
+      window.addEventListener("click", onUserActivity, false);
+      innerPane.addEventListener("scroll", onUserActivity, false);
+
+      /* =======================================================================
+         5. PHOTO LOADING, FACEBOOK QR GENERATOR & LIGHTBOX
+      ======================================================================= */
+      var KEY_CAS = "tw_schmaltzberg_casanunda";
+      var KEY_STR = "tw_schmaltzberg_stronginthearm";
+      var KEY_1988 = "tw_schmaltzberg_imperial1988";
+      var KEY_QR = "tw_schmaltzberg_fb_qr";
+      var SOCIAL_URL = "https://www.facebook.com/groups/1667605298285632";
+
+      function initSocialQr() {
+        var qrImg = document.getElementById("imgQrCode");
+        var savedQr = localStorage.getItem(KEY_QR);
+
+        if (savedQr) {
+          qrImg.src = savedQr;
+          return;
+        }
+
+        if (typeof window.qrcode === "function") {
+          try {
+            var qr = window.qrcode(0, "M");
+            qr.addData(SOCIAL_URL);
+            qr.make();
+            var dataUrl = qr.createDataURL(6, 12);
+            qrImg.src = dataUrl;
+            try { localStorage.setItem(KEY_QR, dataUrl); } catch (e) {}
+            return;
+          } catch (err) {}
+        }
+
+        // Fallback to local file if script wasn't cached & offline on first boot
+        qrImg.src = "qr-facebook.png";
+      }
+
+      function bindImageSlot(imgEl, phEl, src, mirrorEl) {
+        imgEl.onerror = function () {
+          imgEl.style.display = "none";
+          if (phEl) phEl.style.display = "block";
+        };
+        imgEl.onload = function () {
+          imgEl.style.display = "block";
+          if (phEl) phEl.style.display = "none";
+        };
+        imgEl.src = src;
+        if (mirrorEl) {
+          mirrorEl.onerror = function () { mirrorEl.style.display = "none"; };
+          mirrorEl.onload = function () { mirrorEl.style.display = "block"; };
+          mirrorEl.src = src;
+        }
+      }
+
+      function applyPhotos() {
+        var casSrc = localStorage.getItem(KEY_CAS) || "casanunda.jpg";
+        var strSrc = localStorage.getItem(KEY_STR) || "stronginthearm.jpg";
+        var refSrc = localStorage.getItem(KEY_1988) || "imperial1988.jpg";
+
+        bindImageSlot(
+          document.getElementById("imgCasanunda"),
+          document.getElementById("phCasanunda"),
+          casSrc,
+          document.getElementById("imgGalCasanunda")
+        );
+        bindImageSlot(
+          document.getElementById("imgStrong"),
+          document.getElementById("phStrong"),
+          strSrc,
+          document.getElementById("imgGalStrong")
+        );
+        bindImageSlot(
+          document.getElementById("img1988"),
+          document.getElementById("ph1988"),
+          refSrc,
+          null
+        );
+        initSocialQr();
+      }
+
+      function storePickedImage(fileInput, storageKey) {
+        if (!fileInput.files || !fileInput.files[0]) return;
+        var reader = new FileReader();
+        reader.onload = function (evt) {
+          var tempImg = new Image();
+          tempImg.onload = function () {
+            var maxDim = 850;
+            var w = tempImg.width;
+            var h = tempImg.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+              else { w = Math.round(w * (maxDim / h)); h = maxDim; }
+            }
+            var canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext("2d").drawImage(tempImg, 0, 0, w, h);
+            try {
+              localStorage.setItem(storageKey, canvas.toDataURL("image/jpeg", 0.78));
+              applyPhotos();
+            } catch (err) {
+              alert("iPad browser storage full. Clear Safari site data and retry.");
+            }
+          };
+          tempImg.src = evt.target.result;
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      }
+
+      document.getElementById("pickCasanunda").addEventListener("change", function () {
+        storePickedImage(this, KEY_CAS);
+      });
+      document.getElementById("pickStrong").addEventListener("change", function () {
+        storePickedImage(this, KEY_STR);
+      });
+      document.getElementById("pick1988").addEventListener("change", function () {
+        storePickedImage(this, KEY_1988);
+      });
+      document.getElementById("pickQr").addEventListener("change", function () {
+        storePickedImage(this, KEY_QR);
+      });
+
+      function openLightbox(imgEl, caption) {
+        if (!imgEl || imgEl.style.display === "none" || !imgEl.src) return;
+        playTone(1150, 0.05);
+        document.getElementById("lightboxImg").src = imgEl.src;
+        document.getElementById("lightboxCaption").textContent = caption;
+        document.getElementById("lightboxModal").className = "modal-overlay open";
+      }
+
+      document.getElementById("frameCasanunda").addEventListener("click", function () {
+        openLightbox(document.getElementById("imgCasanunda"), "UNIT 01: DALEK CASANUNDA (IMPERIAL WHITE/BRASS)");
+      });
+      document.getElementById("galCasanunda").addEventListener("click", function () {
+        openLightbox(document.getElementById("imgCasanunda"), "UNIT 01: DALEK CASANUNDA (IMPERIAL WHITE/BRASS)");
+      });
+      document.getElementById("frameStrong").addEventListener("click", function () {
+        openLightbox(document.getElementById("imgStrong"), "UNIT 02: DALEK STRONGINTHEARM (62.4% GREY/GOLD HYBRID)");
+      });
+      document.getElementById("galStrong").addEventListener("click", function () {
+        openLightbox(document.getElementById("imgStrong"), "UNIT 02: DALEK STRONGINTHEARM (62.4% GREY/GOLD HYBRID)");
+      });
+      document.getElementById("frame1988").addEventListener("click", function () {
+        openLightbox(document.getElementById("img1988"), "ORIGINAL 1988 BBC IMPERIAL DALEK PROP (REMEMBRANCE OF THE DALEKS)");
+      });
+      document.getElementById("socialQrCard").addEventListener("click", function () {
+        openLightbox(document.getElementById("imgQrCode"), "SCAN TO JOIN OUR FACEBOOK BUILD GROUP (1667605298285632)");
+      });
+      document.getElementById("quickQrBtn").addEventListener("click", function () {
+        openLightbox(document.getElementById("imgQrCode"), "SCAN TO JOIN OUR FACEBOOK BUILD GROUP (1667605298285632)");
+      });
+      document.getElementById("closeLightboxBtn").addEventListener("click", function () {
+        document.getElementById("lightboxModal").className = "modal-overlay";
+      });
+
+      document.getElementById("photoConfigBtn").addEventListener("click", function () {
+        document.getElementById("configModal").className = "modal-overlay open";
+      });
+      document.getElementById("closeConfigBtn").addEventListener("click", function () {
+        document.getElementById("configModal").className = "modal-overlay";
+      });
+      document.getElementById("resetPhotosBtn").addEventListener("click", function () {
+        localStorage.removeItem(KEY_CAS);
+        localStorage.removeItem(KEY_STR);
+        localStorage.removeItem(KEY_1988);
+        localStorage.removeItem(KEY_QR);
+        applyPhotos();
+      });
+      document.getElementById("toggleTimingBtn").addEventListener("click", function () {
+        fastTimingMode = !fastTimingMode;
+        document.getElementById("timerModeLabel").textContent = fastTimingMode
+          ? "Current Mode: FAST DEMO (Random alert after 15–30s idle)"
+          : "Current Mode: CONVENTION (Random alert after 35–75s idle)";
+        scheduleRandomInactivityAlert();
+      });
+      document.getElementById("testBreachBtn").addEventListener("click", function () {
+        document.getElementById("configModal").className = "modal-overlay";
+        triggerContainmentLockdown();
+      });
+
+      var statusLines = [
+        "STATUS: Live / Examining security protocols...",
+        "STATUS: Live / Tracking TW-XENO/DSK-60 (Schmaltzberg)...",
+        "STATUS: Live / Recalibrating 60% vs 62.4% shoulder geometry...",
+        "STATUS: Live / Retcon levels nominal — Discworld still rotating..."
+      ];
+      var sIdx = 0;
+      setInterval(function () {
+        sIdx = (sIdx + 1) % statusLines.length;
+        document.getElementById("statusTicker").textContent = statusLines[sIdx];
+      }, 5500);
+
+      document.getElementById("cornerLogo").addEventListener("click", function () {
+        playTone(1300, 0.07);
+        document.getElementById("nodeCounter").textContent =
+          "BUILDING NODE STRUCTURE " + Math.floor(410000 + Math.random() * 89999);
+      });
+
+      applyPhotos();
+      scheduleRandomInactivityAlert();
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js");
+}
+    })();
+  </script>
+</body>
+</html>
