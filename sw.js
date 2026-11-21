@@ -1,4 +1,4 @@
-var CACHE_NAME = "tw-schmaltzberg-v3";
+var CACHE_NAME = "tw-schmaltzberg-v4";
 var ASSETS = [
   "./",
   "./index.html",
