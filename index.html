@@ -60,7 +60,7 @@
         transparent 1px,
         transparent 3px
       );
-      z-index: 900;
+      z-index: 990;
     }
 
     /* ============================================================
@@ -82,7 +82,7 @@
       position: fixed;
       top: 0; right: 0; bottom: 0; left: 0;
       pointer-events: none;
-      z-index: 820;
+      z-index: 910;
       background-image: -webkit-radial-gradient(
         center, ellipse cover,
         rgba(220, 38, 38, 0) 50%,
@@ -138,6 +138,7 @@
       opacity: 0.9;
       z-index: 25;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
     /* Top Status Bar */
@@ -855,24 +856,6 @@
       color: #93c5fd;
     }
 
-    .kiosk-controls {
-      position: absolute;
-      bottom: 11px;
-      right: 12px;
-      z-index: 30;
-    }
-
-    .kiosk-btn {
-      background: rgba(6, 45, 75, 0.85);
-      border: 1px solid rgba(125, 211, 252, 0.5);
-      color: #bae6fd;
-      font-family: "Courier New", Courier, monospace;
-      font-size: 11px;
-      padding: 7px 10px;
-      margin-left: 5px;
-      cursor: pointer;
-    }
-
     /* ============================================================
        RED ALERT LOCKDOWN POPUP WINDOW
     ============================================================ */
@@ -881,7 +864,7 @@
       position: fixed;
       top: 0; right: 0; bottom: 0; left: 0;
       background: rgba(20, 2, 6, 0.54);
-      z-index: 860;
+      z-index: 930;
       padding: 20px;
       text-align: center;
     }
@@ -1044,6 +1027,10 @@
       text-align: center;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+    }
+
+    .modal-overlay.config-modal {
+      z-index: 980;
     }
 
     .modal-overlay.open { display: block; }
@@ -1212,8 +1199,7 @@
                     <div class="photo-frame" id="frameCasanunda">
                       <img id="imgCasanunda" alt="Dalek Casanunda" />
                       <div class="photo-placeholder" id="phCasanunda" style="display:none;">
-                        IMAGE FILE NOT FOUND: <strong>casanunda.jpg</strong><br /><br />
-                        Tap <strong>[KIOSK / PHOTOS]</strong> below to load from iPad Camera Roll.
+                        IMAGE FILE NOT FOUND: <strong>casanunda.jpg</strong>
                       </div>
                       <div class="photo-caption">FIG 1. CASANUNDA // TAP TO ZOOM</div>
                     </div>
@@ -1241,8 +1227,7 @@
                     <div class="photo-frame" id="frameStrong">
                       <img id="imgStrong" alt="Dalek Stronginthearm" />
                       <div class="photo-placeholder" id="phStrong" style="display:none;">
-                        IMAGE FILE NOT FOUND: <strong>stronginthearm.jpg</strong><br /><br />
-                        Tap <strong>[KIOSK / PHOTOS]</strong> below to load from iPad Camera Roll.
+                        IMAGE FILE NOT FOUND: <strong>stronginthearm.jpg</strong>
                       </div>
                       <div class="photo-caption">FIG 2. STRONGINTHEARM // TAP TO ZOOM</div>
                     </div>
@@ -1319,8 +1304,7 @@
                     <div class="photo-frame" id="frame1988">
                       <img id="img1988" alt="1988 Imperial Dalek Reference" />
                       <div class="photo-placeholder" id="ph1988" style="display:none;">
-                        1988 REFERENCE PHOTO: <strong>imperial1988.jpg</strong><br /><br />
-                        Load via <strong>[KIOSK / PHOTOS]</strong> to show the original BBC prop alongside the build notes.
+                        1988 REFERENCE PHOTO: <strong>imperial1988.jpg</strong>
                       </div>
                       <div class="photo-caption">1988 BBC IMPERIAL DALEK // TAP TO ZOOM</div>
                     </div>
@@ -1386,11 +1370,6 @@
       </svg>
       <div class="node-text" id="nodeCounter">BUILDING NODE STRUCTURE 419270</div>
     </div>
-
-    <div class="kiosk-controls">
-      <button type="button" class="kiosk-btn" id="soundToggle">AUDIO: OFF</button>
-      <button type="button" class="kiosk-btn" id="photoConfigBtn">KIOSK / PHOTOS</button>
-    </div>
   </div>
 
   <!-- RED ALERT LOCKDOWN MODAL -->
@@ -1423,7 +1402,7 @@
             <button type="button" class="override-btn" id="ovTowel">&ldquo;I HAVE A TOWEL&rdquo;</button>
             <button type="button" class="override-btn" id="ovJack">AUTH: 51ST CENTURY</button>
             <div class="lockdown-countdown" id="lockdownCountdown">
-              Auto-purging session in 40s unless overridden... (Psst: try tapping the red padlock 3x!)
+              Reverting to secure logon in 20s unless overridden... (Psst: try tapping the red padlock 3x!)
             </div>
           </div>
         </div>
@@ -1442,18 +1421,19 @@
     </div>
   </div>
 
-  <!-- KIOSK & PHOTO CONFIG MODAL -->
-  <div class="modal-overlay" id="configModal">
+  <!-- HIDDEN KIOSK & PHOTO CONFIG MODAL (5-TAP TOP-RIGHT HEX LOGO TO OPEN) -->
+  <div class="modal-overlay config-modal" id="configModal">
     <div class="modal-box" style="max-width:520px;">
-      <h2 style="margin:0 0 10px 0; color:#ffffff; font-size:17px;">IPAD KIOSK &amp; PHOTO SETTINGS</h2>
+      <h2 style="margin:0 0 10px 0; color:#ffffff; font-size:17px;">ADMIN // KIOSK &amp; PHOTO SETTINGS</h2>
 
       <div style="margin-bottom:14px; padding:10px; border:1px solid #f87171; background:rgba(127,29,29,0.3);">
         <div style="font-size:12px; color:#fecaca; margin-bottom:8px; font-weight:bold;">
-          CONTAINMENT LOCKDOWN TIMER
+          CONTAINMENT LOCKDOWN &amp; AUDIO
         </div>
         <div style="font-size:11px; color:#fee2e2; margin-bottom:10px;" id="timerModeLabel">
-          Current Mode: CONVENTION (Random alert after 35–75s idle)
+          Current Mode: CONVENTION (Random alert after 35–75s idle; reverts to login after 20s)
         </div>
+        <button type="button" class="tw-btn-small" id="soundToggle" style="margin-right:6px; margin-bottom:6px;">AUDIO: OFF</button>
         <button type="button" class="tw-btn-small" id="toggleTimingBtn" style="margin-right:6px; margin-bottom:6px;">SWITCH FAST/CONVENTION TIMING</button>
         <button type="button" class="tw-btn-small" id="testBreachBtn" style="border-color:#f87171; background:rgba(185,28,28,0.7);">TRIGGER BREACH ALERT NOW</button>
       </div>
@@ -1672,8 +1652,18 @@
 
       function playAlertKlaxon() {
         if (!audioEnabled) return;
-        playTone(440, 0.16, "sawtooth");
-        setTimeout(function () { playTone(310, 0.22, "sawtooth"); }, 180);
+        for (var k = 0; k < 5; k++) {
+          (function (delay) {
+            setTimeout(function () {
+              if (!audioEnabled || !isLockedDown) return;
+              playTone(440, 0.15, "sawtooth");
+              setTimeout(function () {
+                if (!audioEnabled || !isLockedDown) return;
+                playTone(310, 0.20, "sawtooth");
+              }, 170);
+            }, delay);
+          })(k * 550);
+        }
       }
 
       document.getElementById("soundToggle").addEventListener("click", function () {
@@ -1696,6 +1686,8 @@
       var overrideToast = document.getElementById("overrideToast");
       var scrollRail = document.querySelector(".tw-scrollbar-rail");
       var scrollThumb = document.querySelector(".scroll-thumb");
+      var lightboxModal = document.getElementById("lightboxModal");
+      var configModal = document.getElementById("configModal");
 
       function syncLeftScrollbar() {
         var railH = scrollRail.clientHeight;
@@ -1762,6 +1754,7 @@
 
       function lockToHome() {
         clearBreachVisuals();
+        lightboxModal.className = "modal-overlay";
         archiveView.className = "archive-shell";
         logonView.style.display = "block";
         windowWrap.className = "tw-window-wrap logon-mode";
@@ -1813,7 +1806,7 @@
       }
 
       /* =======================================================================
-         5. RANDOM INACTIVITY LOCKDOWN & EASTER EGG OVERRIDES
+         5. RANDOM INACTIVITY LOCKDOWN -> REVERT TO LOGIN SCREEN (20s NO INPUT)
       ======================================================================= */
       var redVignette = document.getElementById("redVignette");
       var lockdownModal = document.getElementById("lockdownModal");
@@ -1837,25 +1830,22 @@
         isLockedDown = true;
         padlockTapCount = 0;
 
+        // Ensure any zoomed photo doesn't cover the lockdown alert
+        lightboxModal.className = "modal-overlay";
         redVignette.className = "red-alert-vignette active";
         lockdownModal.className = "lockdown-overlay open";
         playAlertKlaxon();
 
-        var secsLeft = 40;
-        countdownEl.textContent = "Auto-purging session in " + secsLeft + "s unless overridden... (Psst: try tapping the red padlock 3x!)";
+        var secsLeft = 20;
+        countdownEl.textContent = "Reverting to secure logon in " + secsLeft + "s unless overridden... (Psst: try tapping the red padlock 3x!)";
 
         purgeInterval = setInterval(function () {
           secsLeft--;
           if (secsLeft <= 0) {
             clearInterval(purgeInterval);
-            if (isArchiveOpen()) {
-              lockToHome();
-            } else {
-              clearBreachVisuals();
-              scheduleRandomInactivityAlert();
-            }
+            lockToHome();
           } else {
-            countdownEl.textContent = "Auto-purging session in " + secsLeft + "s unless overridden... (Psst: try tapping the red padlock 3x!)";
+            countdownEl.textContent = "Reverting to secure logon in " + secsLeft + "s unless overridden... (Psst: try tapping the red padlock 3x!)";
           }
         }, 1000);
       }
@@ -2045,7 +2035,7 @@
         playTone(1150, 0.05);
         document.getElementById("lightboxImg").src = imgEl.src;
         document.getElementById("lightboxCaption").textContent = caption;
-        document.getElementById("lightboxModal").className = "modal-overlay open";
+        lightboxModal.className = "modal-overlay open";
       }
 
       document.getElementById("frameCasanunda").addEventListener("click", function () {
@@ -2070,14 +2060,34 @@
         openLightbox(document.getElementById("imgQrCode"), "SCAN TO JOIN OUR FACEBOOK BUILD GROUP (1667605298285632)");
       });
       document.getElementById("closeLightboxBtn").addEventListener("click", function () {
-        document.getElementById("lightboxModal").className = "modal-overlay";
+        lightboxModal.className = "modal-overlay";
       });
 
-      document.getElementById("photoConfigBtn").addEventListener("click", function () {
-        document.getElementById("configModal").className = "modal-overlay open";
+      /* =======================================================================
+         7. HIDDEN ADMIN MENU (5 QUICK TAPS ON TOP-RIGHT HEX LOGO)
+      ======================================================================= */
+      var adminTapCount = 0;
+      var adminTapTimer = null;
+
+      document.getElementById("cornerLogo").addEventListener("click", function () {
+        playTone(1300, 0.07);
+        document.getElementById("nodeCounter").textContent =
+          "BUILDING NODE STRUCTURE " + Math.floor(410000 + Math.random() * 89999);
+
+        adminTapCount++;
+        clearTimeout(adminTapTimer);
+        if (adminTapCount >= 5) {
+          adminTapCount = 0;
+          configModal.className = "modal-overlay config-modal open";
+        } else {
+          adminTapTimer = setTimeout(function () {
+            adminTapCount = 0;
+          }, 2200);
+        }
       });
+
       document.getElementById("closeConfigBtn").addEventListener("click", function () {
-        document.getElementById("configModal").className = "modal-overlay";
+        configModal.className = "modal-overlay config-modal";
       });
       document.getElementById("resetPhotosBtn").addEventListener("click", function () {
         localStorage.removeItem(KEY_CAS);
@@ -2089,12 +2099,12 @@
       document.getElementById("toggleTimingBtn").addEventListener("click", function () {
         fastTimingMode = !fastTimingMode;
         document.getElementById("timerModeLabel").textContent = fastTimingMode
-          ? "Current Mode: FAST DEMO (Random alert after 15–30s idle)"
-          : "Current Mode: CONVENTION (Random alert after 35–75s idle)";
+          ? "Current Mode: FAST DEMO (Random alert after 15–30s idle; reverts to login after 20s)"
+          : "Current Mode: CONVENTION (Random alert after 35–75s idle; reverts to login after 20s)";
         scheduleRandomInactivityAlert();
       });
       document.getElementById("testBreachBtn").addEventListener("click", function () {
-        document.getElementById("configModal").className = "modal-overlay";
+        configModal.className = "modal-overlay config-modal";
         triggerContainmentLockdown();
       });
 
@@ -2109,12 +2119,6 @@
         sIdx = (sIdx + 1) % statusLines.length;
         document.getElementById("statusTicker").textContent = statusLines[sIdx];
       }, 5500);
-
-      document.getElementById("cornerLogo").addEventListener("click", function () {
-        playTone(1300, 0.07);
-        document.getElementById("nodeCounter").textContent =
-          "BUILDING NODE STRUCTURE " + Math.floor(410000 + Math.random() * 89999);
-      });
 
       applyPhotos();
       setTimeout(syncLeftScrollbar, 150);
