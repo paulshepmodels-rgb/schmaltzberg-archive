@@ -7,7 +7,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="TW Archive" />
   <title>TORCHWOOD // TW-XENO/DSK-60</title>
-  <!-- MIT-licensed QR generator; auto-cached to localStorage for offline convention halls -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
   <style>
     * {
@@ -24,12 +23,23 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #000b24;
-      background-image: -webkit-radial-gradient(50% 30%, circle, #003b75 0%, #001f4a 45%, #000718 100%);
-      background-image: radial-gradient(circle at 50% 30%, #003b75 0%, #001f4a 45%, #000718 100%);
+      background-color: #00091f;
+      background-image: -webkit-radial-gradient(50% 35%, circle, #00356b 0%, #001a42 48%, #000614 100%);
+      background-image: radial-gradient(circle at 50% 35%, #00356b 0%, #001a42 48%, #000614 100%);
       color: #f0f9ff;
       font-family: "Futura", "Century Gothic", "Trebuchet MS", Helvetica, Arial, sans-serif;
       touch-action: manipulation;
+    }
+
+    /* Animated Torchwood Hub Swirling Background Canvas */
+    #hubBgCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
     }
 
     .scanlines {
@@ -103,10 +113,11 @@
     .hub-frame {
       position: absolute;
       top: 8px; right: 8px; bottom: 8px; left: 8px;
-      border: 1.5px solid rgba(125, 211, 252, 0.55);
+      border: 1.5px solid rgba(125, 211, 252, 0.58);
       -webkit-box-shadow: inset 0 0 36px rgba(0, 140, 255, 0.25);
       box-shadow: inset 0 0 36px rgba(0, 140, 255, 0.25);
       overflow: hidden;
+      z-index: 2;
     }
 
     .bg-watermark {
@@ -195,7 +206,7 @@
       margin-right: 16px;
       border: 2.5px solid #e0f2fe;
       border-radius: 14px;
-      background: rgba(0, 35, 80, 0.45);
+      background: rgba(0, 35, 80, 0.4);
       -webkit-box-shadow: 0 0 18px rgba(56, 189, 248, 0.8), inset 0 0 14px rgba(56, 189, 248, 0.45);
       box-shadow: 0 0 18px rgba(56, 189, 248, 0.8), inset 0 0 14px rgba(56, 189, 248, 0.45);
       padding: 9px;
@@ -239,7 +250,7 @@
     }
 
     /* ============================================================
-       TORCHWOOD MODAL WINDOW (PORTRAIT FULL-HEIGHT ANCHORED)
+       TORCHWOOD MODAL WINDOW
     ============================================================ */
     .tw-window-wrap {
       position: absolute;
@@ -265,7 +276,7 @@
 
     .tw-tab {
       display: inline-block;
-      background: rgba(12, 64, 100, 0.92);
+      background: rgba(12, 64, 100, 0.86);
       border: 1.5px solid rgba(103, 232, 249, 0.78);
       border-bottom: none;
       padding: 5px 18px 4px 12px;
@@ -283,7 +294,7 @@
       right: 0;
       bottom: 0;
       left: 0;
-      background-color: rgba(6, 44, 74, 0.88);
+      background-color: rgba(6, 44, 74, 0.72);
       background-image: -webkit-repeating-linear-gradient(
         114deg,
         rgba(255, 255, 255, 0.025) 0px,
@@ -313,7 +324,7 @@
 
     .tw-address-pill {
       display: inline-block;
-      background: rgba(165, 216, 255, 0.74);
+      background: rgba(165, 216, 255, 0.78);
       color: #03223f;
       font-family: "Courier New", Courier, monospace;
       font-weight: bold;
@@ -362,12 +373,14 @@
       left: 10px;
     }
 
+    /* Live Left-Side Torchwood Scrollbar */
     .tw-scrollbar-rail {
       position: absolute;
       top: 0; bottom: 0; left: 0;
       width: 18px;
       border: 1px solid rgba(186, 230, 253, 0.65);
-      background: rgba(2, 28, 52, 0.65);
+      background: rgba(2, 28, 52, 0.58);
+      cursor: pointer;
     }
 
     .scroll-arrow-up, .scroll-arrow-down {
@@ -379,13 +392,14 @@
       line-height: 22px;
       color: #bae6fd;
       cursor: pointer;
+      z-index: 2;
     }
     .scroll-arrow-up { top: 0; border-bottom: 1px solid rgba(186, 230, 253, 0.35); }
     .scroll-arrow-down { bottom: 0; border-top: 1px solid rgba(186, 230, 253, 0.35); }
 
     .scroll-thumb {
       position: absolute;
-      top: 26px;
+      top: 24px;
       left: 3px;
       right: 3px;
       height: 54px;
@@ -404,17 +418,30 @@
         transparent 2px,
         transparent 4px
       );
+      pointer-events: none;
     }
 
+    /* Native Right-Side Scrollbar Completely Hidden */
     .tw-inner-pane {
       position: absolute;
       top: 0; right: 0; bottom: 0; left: 26px;
       border: 1.5px solid rgba(224, 242, 254, 0.78);
-      background: rgba(3, 28, 52, 0.68);
+      background: rgba(3, 28, 52, 0.56);
       padding: 16px 18px;
       font-family: "Courier New", Courier, monospace;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .tw-inner-pane::-webkit-scrollbar,
+    .tw-inner-pane::-webkit-scrollbar-track,
+    .tw-inner-pane::-webkit-scrollbar-thumb {
+      width: 0 !important;
+      height: 0 !important;
+      display: none !important;
+      background: transparent !important;
     }
 
     /* ============================================================
@@ -473,7 +500,7 @@
       display: block;
       width: 100%;
       padding: 16px 14px;
-      background: rgba(6, 148, 182, 0.68);
+      background: rgba(6, 148, 182, 0.72);
       border: 2px solid #7dd3fc;
       color: #ffffff;
       font-family: "Courier New", Courier, monospace;
@@ -529,7 +556,7 @@
       margin-bottom: 12px;
       padding: 9px 12px;
       border: 1px solid #4ade80;
-      background: rgba(6, 78, 59, 0.6);
+      background: rgba(6, 78, 59, 0.68);
       color: #bbf7d0;
       font-size: 12px;
       line-height: 1.4;
@@ -621,7 +648,7 @@
 
     .callout-box {
       border-left: 3px solid #22d3ee;
-      background: rgba(8, 56, 92, 0.55);
+      background: rgba(8, 56, 92, 0.58);
       padding: 11px 14px;
       margin: 12px 0;
       font-size: 14px;
@@ -653,7 +680,6 @@
       word-break: break-word;
     }
 
-    /* Social QR Card */
     .qr-social-card {
       display: table;
       width: 100%;
@@ -854,7 +880,7 @@
       display: none;
       position: fixed;
       top: 0; right: 0; bottom: 0; left: 0;
-      background: rgba(20, 2, 6, 0.58);
+      background: rgba(20, 2, 6, 0.54);
       z-index: 860;
       padding: 20px;
       text-align: center;
@@ -885,7 +911,7 @@
     }
 
     .lockdown-window {
-      background-color: rgba(48, 8, 14, 0.94);
+      background-color: rgba(48, 8, 14, 0.92);
       background-image: -webkit-repeating-linear-gradient(
         114deg,
         rgba(255, 120, 120, 0.04) 0px,
@@ -1055,6 +1081,7 @@
   </style>
 </head>
 <body>
+  <canvas id="hubBgCanvas"></canvas>
   <div class="scanlines"></div>
   <div class="red-alert-vignette" id="redVignette"></div>
 
@@ -1328,7 +1355,6 @@
                 <p class="lore-p">Instead, printing one extra 62.4% shoulder section gave birth to <strong>Dalek Stronginthearm</strong>. Because Stronginthearm&rsquo;s leftover proportions weren&rsquo;t strictly 1988 screen-accurate, the prop became an intentional crossover between <em>Remembrance</em> Imperials and modern <strong>Time War Daleks</strong>&mdash;complete with a New-Series eye, eyestalk cowl, and plunger.</p>
                 <p class="lore-p">Today, both units feature <strong>colour-changing dome lights</strong> synchronised to a custom <strong>Raspberry Pi voice modulator</strong> designed by the builder.</p>
 
-                <!-- SCANNABLE SOCIAL QR CODE CARD -->
                 <div class="qr-social-card" id="socialQrCard">
                   <div class="qr-img-cell">
                     <div class="qr-white-frame">
@@ -1458,7 +1484,131 @@
   <script>
     (function () {
       /* =======================================================================
-         1. BUILD HEXAGONAL TORCHWOOD 'T' SVGS (ES5 SAFE)
+         1. ANIMATED TORCHWOOD HUB SWIRLING ENERGY RIBBONS (IPAD AIR OPTIMIZED)
+      ======================================================================= */
+      var bgCanvas = document.getElementById("hubBgCanvas");
+      var bgCtx = bgCanvas.getContext("2d");
+      var bgW = 0;
+      var bgH = 0;
+      var bgTime = 0;
+      var isLockedDown = false;
+
+      function resizeHubBg() {
+        bgW = Math.max(320, Math.floor(window.innerWidth * 0.65));
+        bgH = Math.max(320, Math.floor(window.innerHeight * 0.65));
+        bgCanvas.width = bgW;
+        bgCanvas.height = bgH;
+      }
+      window.addEventListener("resize", resizeHubBg, false);
+      resizeHubBg();
+
+      var ribbons = [
+        { vertical: false, baseFrac: 0.24, amp: 48, freq: 0.0055, speed: 0.85, phase: 0.0 },
+        { vertical: false, baseFrac: 0.44, amp: 64, freq: 0.0042, speed: -0.68, phase: 1.7 },
+        { vertical: false, baseFrac: 0.65, amp: 54, freq: 0.0062, speed: 0.72, phase: 3.1 },
+        { vertical: false, baseFrac: 0.82, amp: 42, freq: 0.0048, speed: -0.92, phase: 4.4 },
+        { vertical: true, baseFrac: 0.09, amp: 32, freq: 0.0065, speed: 1.05, phase: 0.8 },
+        { vertical: true, baseFrac: 0.16, amp: 40, freq: 0.0050, speed: -0.82, phase: 2.3 },
+        { vertical: true, baseFrac: 0.90, amp: 34, freq: 0.0058, speed: 0.90, phase: 3.9 }
+      ];
+
+      var orbs = [
+        { x: 0.18, y: 0.28, r: 0.28, sx: 0.35, sy: 0.25, p: 0.4 },
+        { x: 0.82, y: 0.62, r: 0.32, sx: -0.28, sy: 0.32, p: 2.1 },
+        { x: 0.48, y: 0.50, r: 0.35, sx: 0.22, sy: -0.26, p: 4.0 }
+      ];
+
+      function drawHubBackground() {
+        bgCtx.clearRect(0, 0, bgW, bgH);
+        bgCtx.globalCompositeOperation = "lighter";
+
+        var t = bgTime;
+        var speedMult = isLockedDown ? 1.55 : 1.0;
+
+        for (var o = 0; o < orbs.length; o++) {
+          var orb = orbs[o];
+          var ox = (orb.x + Math.sin(t * orb.sx + orb.p) * 0.12) * bgW;
+          var oy = (orb.y + Math.cos(t * orb.sy + orb.p) * 0.12) * bgH;
+          var rad = Math.min(bgW, bgH) * orb.r;
+          var grad = bgCtx.createRadialGradient(ox, oy, 2, ox, oy, rad);
+          if (isLockedDown) {
+            grad.addColorStop(0, "rgba(239, 68, 68, 0.20)");
+            grad.addColorStop(0.55, "rgba(185, 28, 28, 0.08)");
+            grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+          } else {
+            grad.addColorStop(0, "rgba(56, 189, 248, 0.22)");
+            grad.addColorStop(0.55, "rgba(14, 165, 233, 0.08)");
+            grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+          }
+          bgCtx.fillStyle = grad;
+          bgCtx.beginPath();
+          bgCtx.arc(ox, oy, rad, 0, Math.PI * 2, false);
+          bgCtx.fill();
+        }
+
+        var glowCol = isLockedDown ? "rgba(220, 38, 38, 0.11)" : "rgba(14, 165, 233, 0.11)";
+        var midCol  = isLockedDown ? "rgba(248, 113, 113, 0.24)" : "rgba(56, 189, 248, 0.24)";
+        var coreCol = isLockedDown ? "rgba(254, 202, 202, 0.56)" : "rgba(186, 230, 253, 0.56)";
+
+        for (var r = 0; r < ribbons.length; r++) {
+          var rb = ribbons[r];
+          bgCtx.beginPath();
+          if (rb.vertical) {
+            var baseX = rb.baseFrac * bgW;
+            for (var y = -16; y <= bgH + 16; y += 16) {
+              var x = baseX +
+                Math.sin(y * rb.freq + t * rb.speed * speedMult + rb.phase) * rb.amp +
+                Math.cos(y * rb.freq * 0.55 - t * rb.speed * 0.7 + rb.phase) * (rb.amp * 0.45);
+              if (y === -16) bgCtx.moveTo(x, y);
+              else bgCtx.lineTo(x, y);
+            }
+          } else {
+            var baseY = rb.baseFrac * bgH;
+            for (var xPos = -16; xPos <= bgW + 16; xPos += 16) {
+              var yPos = baseY +
+                Math.sin(xPos * rb.freq + t * rb.speed * speedMult + rb.phase) * rb.amp +
+                Math.cos(xPos * rb.freq * 0.45 - t * rb.speed * 0.75 + rb.phase) * (rb.amp * 0.48);
+              if (xPos === -16) bgCtx.moveTo(xPos, yPos);
+              else bgCtx.lineTo(xPos, yPos);
+            }
+          }
+
+          bgCtx.lineWidth = 20;
+          bgCtx.strokeStyle = glowCol;
+          bgCtx.stroke();
+
+          bgCtx.lineWidth = 6.5;
+          bgCtx.strokeStyle = midCol;
+          bgCtx.stroke();
+
+          bgCtx.lineWidth = 1.4;
+          bgCtx.strokeStyle = coreCol;
+          bgCtx.stroke();
+        }
+
+        var tickCount = 34;
+        var barStart = bgW * 0.22;
+        var barSpan = bgW * 0.56;
+        var step = barSpan / tickCount;
+        bgCtx.lineWidth = 2;
+        bgCtx.strokeStyle = isLockedDown ? "rgba(252, 165, 165, 0.35)" : "rgba(125, 211, 252, 0.34)";
+        bgCtx.beginPath();
+        for (var k = 0; k < tickCount; k++) {
+          var tx = barStart + k * step;
+          var th = 5 + Math.abs(Math.sin(t * 2.2 + k * 0.45) * Math.cos(t * 1.1 - k * 0.2)) * 14;
+          bgCtx.moveTo(tx, bgH - 12);
+          bgCtx.lineTo(tx, bgH - 12 - th);
+        }
+        bgCtx.stroke();
+
+        bgCtx.globalCompositeOperation = "source-over";
+        bgTime += 0.014;
+        window.requestAnimationFrame(drawHubBackground);
+      }
+      drawHubBackground();
+
+      /* =======================================================================
+         2. BUILD HEXAGONAL TORCHWOOD 'T' SVGS
       ======================================================================= */
       function buildTorchwoodHexT(svgEl, fill, stroke, strokeWidth) {
         var R = 8.4;
@@ -1491,7 +1641,7 @@
       buildTorchwoodHexT(document.getElementById("cornerLogo"), "#0b2538", "#22d3ee", 2.1);
 
       /* =======================================================================
-         2. AUDIO ENGINE
+         3. AUDIO ENGINE
       ======================================================================= */
       var audioEnabled = false;
       var audioCtx = null;
@@ -1533,7 +1683,7 @@
       });
 
       /* =======================================================================
-         3. VIEW NAVIGATION
+         4. VIEW NAVIGATION & LIVE LEFT TORCHWOOD SCROLLBAR
       ======================================================================= */
       var logonView = document.getElementById("logonView");
       var archiveView = document.getElementById("archiveView");
@@ -1544,6 +1694,53 @@
       var extranetSub = document.getElementById("extranetSub");
       var innerPane = document.getElementById("innerPane");
       var overrideToast = document.getElementById("overrideToast");
+      var scrollRail = document.querySelector(".tw-scrollbar-rail");
+      var scrollThumb = document.querySelector(".scroll-thumb");
+
+      function syncLeftScrollbar() {
+        var railH = scrollRail.clientHeight;
+        var arrowPad = 24;
+        var trackH = railH - arrowPad * 2;
+        if (trackH <= 20) return;
+
+        var scrollH = innerPane.scrollHeight;
+        var clientH = innerPane.clientHeight;
+
+        if (scrollH <= clientH + 2) {
+          scrollThumb.style.height = trackH + "px";
+          scrollThumb.style.top = arrowPad + "px";
+          return;
+        }
+
+        var thumbH = Math.max(30, Math.floor(trackH * (clientH / scrollH)));
+        var maxScroll = scrollH - clientH;
+        var ratio = innerPane.scrollTop / maxScroll;
+        if (ratio < 0) ratio = 0;
+        if (ratio > 1) ratio = 1;
+
+        scrollThumb.style.height = thumbH + "px";
+        scrollThumb.style.top = (arrowPad + Math.floor((trackH - thumbH) * ratio)) + "px";
+      }
+
+      innerPane.addEventListener("scroll", syncLeftScrollbar, false);
+      window.addEventListener("resize", syncLeftScrollbar, false);
+
+      scrollRail.addEventListener("click", function (e) {
+        if (e.target.id === "scrollUpBtn" || e.target.id === "scrollDownBtn") return;
+        var rect = scrollRail.getBoundingClientRect();
+        var clickY = e.clientY - rect.top - 24;
+        var trackH = rect.height - 48;
+        if (trackH <= 0) return;
+        var pct = Math.max(0, Math.min(1, clickY / trackH));
+        innerPane.scrollTop = pct * (innerPane.scrollHeight - innerPane.clientHeight);
+      }, false);
+
+      document.getElementById("scrollUpBtn").addEventListener("click", function () {
+        innerPane.scrollTop -= 130;
+      });
+      document.getElementById("scrollDownBtn").addEventListener("click", function () {
+        innerPane.scrollTop += 130;
+      });
 
       function isArchiveOpen() {
         return archiveView.className.indexOf("active") !== -1;
@@ -1559,6 +1756,7 @@
         addressBar.textContent = "/TORCHWOOD HUB/ARCHIVE/SCHMALTZBERG_DALEKS";
         extranetSub.textContent = agentSubtitle || "secure_extranet: logged in";
         innerPane.scrollTop = 0;
+        setTimeout(syncLeftScrollbar, 40);
         scheduleRandomInactivityAlert();
       }
 
@@ -1573,6 +1771,7 @@
         extranetSub.textContent = "secure_extranet: logged in";
         document.getElementById("agentInput").value = "";
         overrideToast.style.display = "none";
+        setTimeout(syncLeftScrollbar, 40);
         scheduleRandomInactivityAlert();
       }
 
@@ -1609,18 +1808,12 @@
           this.className = "nav-tab active";
           document.getElementById(targetId).className = "tab-panel active";
           innerPane.scrollTop = 0;
+          setTimeout(syncLeftScrollbar, 30);
         });
       }
 
-      document.getElementById("scrollUpBtn").addEventListener("click", function () {
-        innerPane.scrollTop -= 130;
-      });
-      document.getElementById("scrollDownBtn").addEventListener("click", function () {
-        innerPane.scrollTop += 130;
-      });
-
       /* =======================================================================
-         4. RANDOM INACTIVITY LOCKDOWN & EASTER EGG OVERRIDES
+         5. RANDOM INACTIVITY LOCKDOWN & EASTER EGG OVERRIDES
       ======================================================================= */
       var redVignette = document.getElementById("redVignette");
       var lockdownModal = document.getElementById("lockdownModal");
@@ -1629,7 +1822,6 @@
       var purgeInterval = null;
       var fastTimingMode = false;
       var padlockTapCount = 0;
-      var isLockedDown = false;
 
       function clearBreachVisuals() {
         isLockedDown = false;
@@ -1689,8 +1881,10 @@
         }
         overrideToast.textContent = message;
         overrideToast.style.display = "block";
+        setTimeout(syncLeftScrollbar, 30);
         setTimeout(function () {
           overrideToast.style.display = "none";
+          syncLeftScrollbar();
         }, 7000);
       }
 
@@ -1724,7 +1918,7 @@
       innerPane.addEventListener("scroll", onUserActivity, false);
 
       /* =======================================================================
-         5. PHOTO LOADING, FACEBOOK QR GENERATOR & LIGHTBOX
+         6. PHOTO LOADING, FACEBOOK QR GENERATOR & LIGHTBOX
       ======================================================================= */
       var KEY_CAS = "tw_schmaltzberg_casanunda";
       var KEY_STR = "tw_schmaltzberg_stronginthearm";
@@ -1753,7 +1947,6 @@
           } catch (err) {}
         }
 
-        // Fallback to local file if script wasn't cached & offline on first boot
         qrImg.src = "qr-facebook.png";
       }
 
@@ -1761,15 +1954,20 @@
         imgEl.onerror = function () {
           imgEl.style.display = "none";
           if (phEl) phEl.style.display = "block";
+          setTimeout(syncLeftScrollbar, 20);
         };
         imgEl.onload = function () {
           imgEl.style.display = "block";
           if (phEl) phEl.style.display = "none";
+          setTimeout(syncLeftScrollbar, 20);
         };
         imgEl.src = src;
         if (mirrorEl) {
           mirrorEl.onerror = function () { mirrorEl.style.display = "none"; };
-          mirrorEl.onload = function () { mirrorEl.style.display = "block"; };
+          mirrorEl.onload = function () {
+            mirrorEl.style.display = "block";
+            setTimeout(syncLeftScrollbar, 20);
+          };
           mirrorEl.src = src;
         }
       }
@@ -1919,10 +2117,12 @@
       });
 
       applyPhotos();
+      setTimeout(syncLeftScrollbar, 150);
       scheduleRandomInactivityAlert();
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js");
-}
+
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js");
+      }
     })();
   </script>
 </body>
