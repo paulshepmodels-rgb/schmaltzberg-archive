@@ -1652,8 +1652,18 @@
 
       function playAlertKlaxon() {
         if (!audioEnabled) return;
-        playTone(440, 0.16, "sawtooth");
-        setTimeout(function () { playTone(310, 0.22, "sawtooth"); }, 180);
+        for (var k = 0; k < 5; k++) {
+          (function (delay) {
+            setTimeout(function () {
+              if (!audioEnabled || !isLockedDown) return;
+              playTone(440, 0.15, "sawtooth");
+              setTimeout(function () {
+                if (!audioEnabled || !isLockedDown) return;
+                playTone(310, 0.20, "sawtooth");
+              }, 170);
+            }, delay);
+          })(k * 550);
+        }
       }
 
       document.getElementById("soundToggle").addEventListener("click", function () {
